@@ -133,82 +133,90 @@ export default function RegistrationForm({
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form className="bg-white p-8 rounded shadow-md" onSubmit={handleSubmit}>
-        <h1 className="text-2xl mb-4">Create an Account</h1>
-
-        <input
-          className="border p-2 w-full mb-4"
-          type="text"
-          placeholder="First Name"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-        />
-        <input
-          className="border p-2 w-full mb-4"
-          type="text"
-          placeholder="Last Name"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-        />
-        <input
-          className="border p-2 w-full mb-4"
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          className="border p-2 w-full mb-4"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <input
-          className="border p-2 w-full mb-4"
-          type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
-        <input
-          className="border p-2 w-full mb-4"
-          type="email"
-          placeholder="Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          className="border p-2 w-full mb-4"
-          type="tel"
-          placeholder="Phone Number"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-        />
-        {Object.values(errors).map((error) => (
-          <p className="text-red-500 mb-2" key={error}>
-            {error}
-          </p>
-        ))}
-        <button
-          className="bg-blue-500 text-white p-2 w-full mb-4 rounded"
-          type="submit"
-        >
-          Register
-        </button>
-        <button
-          className="bg-red-500 text-white p-2 w-full mb-4 rounded"
-          //   onClick={handleSignUpWithGoogle}
-        >
-          Sign Up with Google
-        </button>
-        <div className="text-center">
-          <a className="underline text-blue-500" href="/login">
-            Already have an account? Sign in
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="p-8 bg-white rounded-xl shadow-lg w-96">
+        <h1 className="text-2xl font-semibold mb-4">Create an Account</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="First Name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          />
+          <input
+            type="text"
+            placeholder="Last Name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          />
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          />
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          />
+          <input
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          />
+          <input
+            type="tel"
+            placeholder="Phone Number"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          />
+          {Object.values(errors).map((error) => (
+            <p className="text-red-500" key={error}>
+              {error}
+            </p>
+          ))}
+          <button
+            type="submit"
+            className="w-full p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            Register
+          </button>
+          <button
+            // onClick={handleSignUpWithGoogle}
+            className="w-full p-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+          >
+            Sign Up with Google
+          </button>
+        </form>
+        <div className="mt-4 text-center">
+          Already have an account?{" "}
+          <a href="/login" className="text-blue-500 underline">
+            Sign in
           </a>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
