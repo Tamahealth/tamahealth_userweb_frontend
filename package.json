@@ -2,7 +2,6 @@
   "name": "tamafrontendv1",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -28,6 +27,8 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "postcss": "^8.4.30",
     "tailwindcss": "^3.3.3",
+    "vite": "^4.4.5",
+    "vite-plugin-tailwindcss": "^0.0.0-0"
     "vite": "^4.4.5"
   }
 }
