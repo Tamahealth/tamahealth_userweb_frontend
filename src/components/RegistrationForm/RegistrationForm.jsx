@@ -19,7 +19,6 @@ export default function RegistrationForm({
   const [errors, setErrors] = useState({});
 
   const handleRegistrationSubmit = async ({
-    username,
     email,
     password,
     firstName,
@@ -34,7 +33,6 @@ export default function RegistrationForm({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username,
           email,
           password,
           firstName,
@@ -123,11 +121,11 @@ export default function RegistrationForm({
 
     // Perform registration logic
     handleRegistrationSubmit({
-      username,
       email,
       firstName,
       lastName,
       password,
+      phoneNumber,
     });
     setErrors({});
   };
@@ -153,14 +151,7 @@ export default function RegistrationForm({
             required
             className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
           />
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
-          />
+
           <input
             type="password"
             placeholder="Password"
