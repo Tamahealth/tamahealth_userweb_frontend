@@ -1,0 +1,44 @@
+.container {
+    @apply flex justify-center items-center h-screen;
+  }
+  
+  .form-container {
+    @apply bg-white p-8 rounded-md h-screen w-60vh shadow-md;
+    
+  }
+  
+  .title {
+    @apply text-2xl font-bold mb-4 font-sans rounded-full text-blue-700 text-center;
+  }
+  .input-field {
+    @apply w-full p-3 border  bg-blue-50 border-white rounded-md outline-none transition duration-300;
+  }
+  
+  /* .welcome {
+    @apply text-sm font-serif font-bold rounded-full text-black text-center;
+  } */
+  .input-field:focus {
+    @apply border-blue-500  text-white outline-none ring-1 ring-blue-700 ;
+  }
+  .custom-link {
+    @apply  cursor-pointer;
+    /* Additional styles if needed */
+  }
+  .button {
+    @apply w-full bg-blue-600 text-black p-3 border rounded-md transition duration-300;
+  }
+  
+  .button:hover {
+    @apply bg-white;
+  }
+  
+
+  
+  .google-icon {
+    @apply mr-2;
+  }
+  .w-60vh {
+    width: 60vh;
+  }
+  
+  

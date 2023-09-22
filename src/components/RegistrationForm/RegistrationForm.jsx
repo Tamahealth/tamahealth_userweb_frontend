@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import jwtDecode from "jwt-decode";
+import "./RegistrationForm.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL || "http://localhost:3001";
 
@@ -131,80 +134,92 @@ export default function RegistrationForm({
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="p-8 bg-white rounded-xl shadow-lg w-96">
-        <h1 className="text-2xl font-semibold mb-4">Create an Account</h1>
+    <div className="container">
+      <div className="form-container" style={{ height: "105vh" }}>
+        <h1 className="title mt-4">Create an Account</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="mb-4">
           <input
             type="text"
             placeholder="First Name"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="input-field"
           />
+        </div>
+        <div className="mb-4">
           <input
             type="text"
             placeholder="Last Name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="input-field"
           />
-
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="input-field"
           />
+          </div>
+          <div className="mb-4">
           <input
             type="password"
             placeholder="Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="input-field"
           />
+          </div>
+          <div className="mb-4">
           <input
             type="email"
             placeholder="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="input-field"
           />
+          </div>
+          <div className="mb-4">
           <input
             type="tel"
             placeholder="Phone Number"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="input-field"
           />
           {Object.values(errors).map((error) => (
             <p className="text-red-500" key={error}>
               {error}
             </p>
           ))}
+          </div>
           <button
             type="submit"
-            className="w-full p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="button bg-blue-500 text-black"
           >
             Register
           </button>
-          <button
-            // onClick={handleSignUpWithGoogle}
-            className="w-full p-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
-          >
-            Sign Up with Google
-          </button>
         </form>
-        <div className="mt-4 text-center">
-          Already have an account?{" "}
-          <a href="/login" className="text-blue-500 underline">
-            Sign in
+        <div className="mt-4 text-center" style={{ marginTop: "7vh" }}>
+          <a href="/register" className="text-black">
+            Create new account
+          </a>
+        </div>
+        <div style={{ marginTop: "3vh" }} className="mb-7 ">
+          <a
+            href="#"
+            // onClick={handleSignUpWithGoogle}
+            className="text-blue-500 hover:underline ml-20"
+          >
+            <FontAwesomeIcon icon={faGoogle} className="mr-2" />
+            or continue with google
           </a>
         </div>
       </div>

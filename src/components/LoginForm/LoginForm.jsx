@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import jwtDecode from "jwt-decode";
+import "./LoginForm.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL || "http://localhost:3001";
 
 export default function LoginForm({
@@ -84,47 +87,57 @@ export default function LoginForm({
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="p-8 bg-white rounded-xl shadow-lg w-96">
-        <h1 className="text-2xl font-semibold mb-4">Sign in</h1>
+    <div className="container">
+      <div className="form-container" style={{ height: "80vh" }}>
         <form onSubmit={handleSignIn} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Email or Phone Number"
-            value={credential}
-            onChange={(e) => setCredential(e.target.value)}
-            required
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={handlePasswordChange}
-            required
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
-          />
-          {passwordError && (
-            <span className="text-red-500">Incorrect password!</span>
-          )}
-          <button
-            type="submit"
-            className="w-full p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
+          <h2 className="title mt-4" style={{ marginBottom: "7v h" }}>
+            Login here
+          </h2>
+
+          {/* <p className="welcome mt-2 mb-4">Welcome back</p> */}
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Email or Phone Number"
+              value={credential}
+              onChange={(e) => setCredential(e.target.value)}
+              required
+              className="input-field "
+            />
+          </div>
+          <div className="mb-4">
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={handlePasswordChange}
+              required
+              className="input-field"
+            />
+            {passwordError && (
+              <span className="text-red-500">Incorrect password!</span>
+            )}
+          </div>
+          <a href="#" className="text-blue-600 hover:underline ml-60">
+            Forgot Password?
+          </a>
+          <button type="submit" className="button bg-blue-500 text-black">
             Sign In
           </button>
-          <button
-            type="button"
-            onClick={handleSignInWithGoogle}
-            className="w-full p-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
-          >
-            Sign In with Google
-          </button>
         </form>
-        <div className="mt-4 text-center">
-          Don't have an account?{" "}
-          <a href="/register" className="text-blue-500 underline">
-            Register
+        <div className="mt-4 text-center" style={{ marginTop: "7vh" }}>
+          <a href="/register" className="text-black">
+            Create new account
+          </a>
+        </div>
+        <div style={{ marginTop: "7vh" }} className="mb-7 ">
+          <a
+            href="#"
+            onClick={handleSignInWithGoogle}
+            className="text-blue-500 hover:underline ml-20"
+          >
+            <FontAwesomeIcon icon={faGoogle} className="mr-2" />
+            or continue with google
           </a>
         </div>
       </div>
