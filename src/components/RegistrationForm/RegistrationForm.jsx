@@ -22,7 +22,6 @@ export default function RegistrationForm({
   const [errors, setErrors] = useState({});
 
   const handleRegistrationSubmit = async ({
-    username,
     email,
     password,
     firstName,
@@ -37,7 +36,6 @@ export default function RegistrationForm({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username,
           email,
           password,
           firstName,
@@ -126,11 +124,11 @@ export default function RegistrationForm({
 
     // Perform registration logic
     handleRegistrationSubmit({
-      username,
       email,
       firstName,
       lastName,
       password,
+      phoneNumber,
     });
     setErrors({});
   };
@@ -159,18 +157,6 @@ export default function RegistrationForm({
             required
             className="input-field"
           />
-          </div>
-          <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className="input-field"
-          />
-          </div>
-          <div className="mb-4">
           <input
             type="password"
             placeholder="Password"
