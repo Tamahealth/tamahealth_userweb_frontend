@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { MenuIcon } from "@heroicons/react/solid";
-import "./NavBar.css";
 
 export default function NavBar({
   loggedIn,
@@ -51,7 +50,7 @@ export default function NavBar({
   );
 
   return (
-    <div className="bg-white p-2 h-16 shadow-md">
+    <div className="bg-white p-2 h-24 shadow-md">
       <div className="container mx-auto flex items-center justify-between h-full">
         <Link to="/" className="text-blue-500 text-2xl font-bold">
           TAMAHealth
@@ -62,7 +61,7 @@ export default function NavBar({
         >
           <MenuIcon className="h-6 w-6 text-blue-500" />
         </button>
-        <div className={`hidden md:flex ml-auto space-x-4 items-center`}>
+        <div className={`hidden md:flex ml-auto space-x-4 items-center mr-20`}>
           <MenuButton label="Home" path="/" />
           <MenuButton label="About Us" path="/AboutUs" />
           <MenuButton label="Contact Us" path="/ContactUs" />
@@ -76,7 +75,7 @@ export default function NavBar({
             >
               Logout
             </button>
-            <Avatar src={avatarUrl} className="ml-4"></Avatar>
+            {/* <Avatar src={avatarUrl} className="ml-4"></Avatar> */}
           </>
         ) : (
           <div className="hidden md:flex space-x-4">
@@ -91,29 +90,33 @@ export default function NavBar({
       </div>
       {showMenu && (
         <div
-          style={{ backgroundColor: "white", zIndex: 1000, opacity: 1 }}
-          className="md:hidden p-2"
+          style={{
+            backgroundColor: "white",
+            zIndex: 1000,
+            position: "relative",
+          }}
+          className="md:hidden p-2 transition-all duration-500 ease-in-out"
         >
           <div className="flex flex-col space-y-1">
             <MenuButton
               label="Home"
               path="/"
-              additionalClasses="ml-2 border-b"
+              additionalClasses="ml-2 border-b-1"
             />
             <MenuButton
               label="About Us"
               path="/AboutUs"
-              additionalClasses="ml-2 border-b"
+              additionalClasses="ml-2 border-b-1"
             />
             <MenuButton
               label="Contact Us"
               path="/ContactUs"
-              additionalClasses="ml-2 border-b"
+              additionalClasses="ml-2 border-b-1"
             />
             <MenuButton
               label="FAQ"
               path="/FAQ"
-              additionalClasses="ml-2 border-b"
+              additionalClasses="ml-2 border-b-1"
             />
             {!loggedIn && (
               <button

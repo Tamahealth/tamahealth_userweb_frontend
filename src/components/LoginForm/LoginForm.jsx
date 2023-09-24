@@ -52,6 +52,14 @@ export default function LoginForm({
   const styles = isMobile ? stylesMobile : stylesDesktop;
 
   useEffect(() => {
+    if (loginOption === "email") {
+      setCredential(email);
+    } else {
+      setCredential(phone);
+    }
+  }, [email, phone, loginOption]);
+
+  useEffect(() => {
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
     if (token && user) {
@@ -101,6 +109,7 @@ export default function LoginForm({
     }
   };
 
+  // I will check it later
   const handlePasswordChange = (event) => {
     if (passwordError === true) {
       setPasswordError(false);
@@ -114,8 +123,10 @@ export default function LoginForm({
 
   const handleSignIn = (e) => {
     e.preventDefault();
+    let isEmail = loginOption === "email";
+    let activeCredential = isEmail ? email : phone;
     handleLoginSubmit({
-      credential,
+      credential: activeCredential,
       password,
     });
   };

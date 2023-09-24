@@ -43,69 +43,71 @@ export default function App() {
 
   return (
     <>
-      <Router forceRefresh={true} basename="/">
-        <NavBar
-          loggedIn={loggedIn}
-          user={user}
-          setLoggedIn={setLoggedIn}
-          setUser={setUser}
-          setLoginError={setLoginError}
-        />
-        <Routes>
-          <Route
-            path="/"
-            element={
-              loggedIn ? (
-                <AuthenticatedLandingPage user={user} userData={userData} />
-              ) : (
-                <LandingPage />
-              )
-            }
+      <div>
+        <Router forceRefresh={true} basename="/">
+          <NavBar
+            loggedIn={loggedIn}
+            user={user}
+            setLoggedIn={setLoggedIn}
+            setUser={setUser}
+            setLoginError={setLoginError}
           />
-          <Route
-            path="/register"
-            element={
-              loggedIn ? (
-                <Navigate to="/home" />
-              ) : (
-                <RegistrationForm
-                  setUser={setUser}
-                  user={user}
-                  setLoginError={setLoginError}
-                  setLoggedIn={setLoggedIn}
-                />
-              )
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              loggedIn ? (
-                <Navigate to="/" />
-              ) : (
-                <LoginForm
-                  setUser={setUser}
-                  user={user}
-                  setLoginError={setLoginError}
-                  setLoggedIn={setLoggedIn}
-                  setUserData={handleUserDataUpdate}
-                />
-              )
-            }
-          />
-          <Route
-            path="/home"
-            element={
-              <PrivateRoute>
-                <AuthenticatedLandingPage user={user} />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/ContactUs" element={<ContactUs />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-      <Footer />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                loggedIn ? (
+                  <AuthenticatedLandingPage user={user} userData={userData} />
+                ) : (
+                  <LandingPage />
+                )
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                loggedIn ? (
+                  <Navigate to="/home" />
+                ) : (
+                  <RegistrationForm
+                    setUser={setUser}
+                    user={user}
+                    setLoginError={setLoginError}
+                    setLoggedIn={setLoggedIn}
+                  />
+                )
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                loggedIn ? (
+                  <Navigate to="/" />
+                ) : (
+                  <LoginForm
+                    setUser={setUser}
+                    user={user}
+                    setLoginError={setLoginError}
+                    setLoggedIn={setLoggedIn}
+                    setUserData={handleUserDataUpdate}
+                  />
+                )
+              }
+            />
+            <Route
+              path="/home"
+              element={
+                <PrivateRoute>
+                  <AuthenticatedLandingPage user={user} />
+                </PrivateRoute>
+              }
+            />
+            <Route path="/ContactUs" element={<ContactUs />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Footer />
+        </Router>
+      </div>
     </>
   );
 }
