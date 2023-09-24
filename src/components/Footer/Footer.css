@@ -1,0 +1,129 @@
+.footer {
+    background-color: #3b82f6;
+    color: #fff;
+    padding: 1rem 0;
+  }
+  
+  .footer-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+  
+  .footer-section {
+    flex: 1;
+    margin: 0.5rem;
+    text-align: left;
+  }
+  
+  .footer-section h3 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    padding-left: 120px;
+  }
+
+  .footer-section-contact h3 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    text-align: left;
+
+  }
+  
+  .footer-section ul {
+    list-style-type: none;
+    padding: 0;
+    padding-left: 120px;
+  }
+  
+  .footer-section li {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+  }
+  
+  .footer-section a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .footer-section a:hover {
+    text-decoration: underline;
+  }
+  
+  .footer-bottom {
+    text-align: center;
+    font-size: 0.8rem;
+    padding: 1rem;
+  }
+  
+  /* Social Media Icons */
+  .social-media {
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+    padding-left: 120px;
+  }
+
+  .social-media a:hover {
+    transform: scale(1.1);
+    color: #17007b;
+    border-bottom: 1px solid #fff;
+  }
+  
+  .social-media a {
+    margin-right: 1rem;
+    font-size: 1.5rem;
+  }
+  
+  /* Media Query for Mobile Responsiveness */
+/* Media Query for Mobile Responsiveness */
+@media only screen and (max-width: 768px) {
+  .footer-container {
+    flex-wrap: wrap;  /* Allow items to wrap onto the next line */
+    justify-content: center;
+    padding: 0.5rem;
+  }
+
+  /* General settings for footer-sections */
+  .footer-section {
+    margin: 0.5rem 0;
+    padding-left: 3px;
+    text-align: left !important;
+  }
+
+  /* Targeting the first two columns to be 50% width */
+  .footer-section:nth-child(-n+2) {
+    flex-basis: calc(50% - 1rem); /* Takes up half of the container minus margins */
+    text-align: center;
+  }
+
+  /* Targeting the contact and social media to be 100% width */
+  .footer-section-contact,
+  .social-media {
+    flex-basis: 100%; /* Takes full width */
+  }
+
+  .footer-section h3,
+  .footer-section-contact h3 {
+    font-size: 1.4rem;
+    padding-left: 10px;
+
+  }
+
+  .footer-section ul {
+    padding-left: 10px;
+  }
+
+  .social-media {
+    justify-content: center;
+    gap: 10px;
+    padding-left: 0;
+  }
+
+  .footer-bottom {
+    padding: 0.5rem;
+  }
+  .address{
+    padding-left: 10px;
+  }
+}
