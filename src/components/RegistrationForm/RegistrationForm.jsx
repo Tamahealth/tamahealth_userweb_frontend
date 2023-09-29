@@ -11,7 +11,6 @@ export default function RegistrationForm({
   setUser,
   setLoginError,
 }) {
-  const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
@@ -19,6 +18,18 @@ export default function RegistrationForm({
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [errors, setErrors] = useState({});
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+
+  // define navigate function
+  const navigate = useNavigate();
+
+  const sendOtp = async () => {
+    // call api to send otp
+    // update the otpSent state if successfully sent
+    setOtpSent(true);
+    navigate("/otp-verification");
+  };
 
   const handleRegistrationSubmit = async ({
     email,
@@ -63,8 +74,9 @@ export default function RegistrationForm({
 
         setLoggedIn(true);
         setLoginError("");
-        navigate("/");
+        navigate("/home");
         console.log(data.message);
+        await sendOtp();
       } else {
         setLoginError(data.message);
         console.log(data.message);
@@ -208,15 +220,20 @@ export default function RegistrationForm({
           </div>
           <div className="mb-4">
             <label className="text-black">Phone Number</label>
-            <input
-              name="phoneNumber"
-              type="tel"
-              placeholder="Phone Number"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
-              className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
-            />
+            <div className="flex items-center">
+              <span className="inline-block bg-gray-200 text-gray-700 p-2 rounded-l">
+                +1
+              </span>
+              <input
+                name="phoneNumber"
+                type="tel"
+                placeholder="Phone Number"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+                className="w-full py-2 px-3 border rounded-r text-blue bg-sky-50 flex-1"
+              />
+            </div>
           </div>
           {Object.values(errors).map((error) => (
             <p className="text-red-500" key={error}>
