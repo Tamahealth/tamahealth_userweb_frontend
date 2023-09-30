@@ -11,7 +11,6 @@ export default function NavBar({
 }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [avatarUrl, setAvatarUrl] = useState("");
   const [userDataID, setUserDataID] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState("");
@@ -22,11 +21,12 @@ export default function NavBar({
     setUserDataID(userID);
     setSelectedMenu(location.pathname);
 
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setAvatarUrl(user.avatar);
+    if (storedUser && storedUser !== "undefined") {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      setLoggedIn(true); // Update loggedIn state
     }
-  }, [location]);
+  }, [location, setUser, setLoggedIn]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

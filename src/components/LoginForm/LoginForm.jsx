@@ -39,18 +39,24 @@ export default function LoginForm({
   setLoginError,
   setUserData,
 }) {
+  // the useState hook is used to create state variables
   const [credential, setCredential] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [loginOption, setLoginOption] = useState("email");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpValue, setOtpValue] = useState("");
 
+  // the useNavigate hook is used for navigating between pages
   const navigate = useNavigate();
 
+  // usestate for styling mobile screens
   const isMobile = window.innerWidth <= 768;
   const styles = isMobile ? stylesMobile : stylesDesktop;
 
+  // useEffect hook is used to run code when the component is mounted
   useEffect(() => {
     if (loginOption === "email") {
       setCredential(email);
@@ -68,6 +74,7 @@ export default function LoginForm({
     }
   }, []);
 
+  // the handleLoginSubmit function is used to handle the login form submission
   const handleLoginSubmit = async ({ credential, password }) => {
     let isEmail = credential.includes("@");
     let requestBody = isEmail
@@ -109,7 +116,7 @@ export default function LoginForm({
     }
   };
 
-  // I will check it later
+  // fixed it!
   const handlePasswordChange = (event) => {
     if (passwordError === true) {
       setPasswordError(false);
@@ -117,10 +124,12 @@ export default function LoginForm({
     setPassword(event.target.value);
   };
 
+  // the handleSignInWithGoogle function is used to handle the googleAuth sign in button
   const handleSignInWithGoogle = () => {
     signInWithGoogle({ setLoggedIn, navigate, setUser });
   };
 
+  // signIn handler based on login option
   const handleSignIn = (e) => {
     e.preventDefault();
     let isEmail = loginOption === "email";
@@ -129,6 +138,10 @@ export default function LoginForm({
       credential: activeCredential,
       password,
     });
+  };
+
+  const handleOtpSubmit = async (e) => {
+    // logic
   };
 
   return (
@@ -187,7 +200,7 @@ export default function LoginForm({
                   type="password"
                   placeholder="Password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handlePasswordChange}
                   requiredrfg="true"
                   className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
                 />
@@ -196,29 +209,58 @@ export default function LoginForm({
                     Forgot Password?
                   </a>
                 </div>
+                <button
+                  className="bg-blue-500 hover:bg-blue-400 text-white py-2 px-4 rounded mt-4 w-full"
+                  type="submit"
+                >
+                  Sign In with Email
+                </button>
               </div>
             </>
           ) : (
-            <div className="mb-4">
-              <label className="text-black !important">Phone Number</label>
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-                pattern="[+1]{0,2}[0-9]{10}"
-                autocomplete="tel"
-                className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
-              />
-            </div>
+            <>
+              <div className="mb-4">
+                <label className="text-black !important">Phone Number</label>
+                <input
+                  type="tel"
+                  placeholder="Phone Number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                  pattern="[+1]{0,2}[0-9]{10}"
+                  autoComplete="tel"
+                  className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
+                />
+                {!otpSent ? (
+                  <button
+                    onClick={() => {
+                      setOtpSent(true);
+                      // Logic to send OTP
+                    }}
+                    className="bg-blue-500 hover:bg-blue-400 text-white py-2 px-4 rounded mt-4 w-full"
+                  >
+                    Send OTP
+                  </button>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="Enter OTP"
+                      value={otpValue}
+                      onChange={(e) => setOtpValue(e.target.value)}
+                      className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
+                    />
+                    <button
+                      onClick={handleOTPSubmit}
+                      className="bg-blue-500 hover:bg-blue-400 text-white py-2 px-4 rounded mt-4 w-full"
+                    >
+                      Verify OTP
+                    </button>
+                  </>
+                )}
+              </div>
+            </>
           )}
-          <button
-            className="bg-blue-500 hover:bg-blue-400 text-white py-2 px-4 rounded mt-4 w-full"
-            type="submit"
-          >
-            Sign In
-          </button>
         </form>
         <div className="mt-4 text-center">
           <button

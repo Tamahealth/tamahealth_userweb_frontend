@@ -16,6 +16,7 @@ import ContactUs from "./components/ContactUs/ContactUs";
 import NavBar from "./components/NavBar/NavBar";
 import Footer from "./components/Footer/Footer";
 import NotFound from "./components/NotFound/NotFound";
+import OTPVerification from "./components/RegistrationForm/OtpVerification";
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -102,6 +103,7 @@ export default function App() {
                 </PrivateRoute>
               }
             />
+            <Route path="/otp-verification" element={<OTPVerification />} />
             <Route path="/ContactUs" element={<ContactUs />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

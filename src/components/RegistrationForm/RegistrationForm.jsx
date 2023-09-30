@@ -1,17 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import jwtDecode from "jwt-decode";
+import FormComponent from "./RegForm";
+import { handleRegistrationSubmit, sendOtp } from "./RegistrationFunctions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL || "http://localhost:3001";
 
-export default function RegistrationForm({
-  setLoggedIn,
-  setUser,
-  setLoginError,
-}) {
-  const [username, setUsername] = useState("");
+export default function MainComponent({ setLoggedIn, setUser }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
@@ -19,229 +16,72 @@ export default function RegistrationForm({
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [errors, setErrors] = useState({});
+  const [loginError, setLoginError] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
 
-  const handleRegistrationSubmit = async ({
-    email,
-    password,
-    firstName,
-    lastName,
-    phoneNumber,
-    navigate,
-  }) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          firstName,
-          lastName,
-          phoneNumber,
-        }),
-      });
+  const navigate = useNavigate();
 
-      const data = await response.json();
-      if (response.ok) {
-        const token = data.token;
-        const decodedToken = jwtDecode(token);
-        const userData = {
-          ...decodedToken,
-          username: decodedToken.username,
-          email: decodedToken.email,
-          fullName: `${decodedToken.firstName} ${decodedToken.lastName}`,
-        };
-        localStorage.setItem("token", token);
-        localStorage.setItem("userId", decodedToken.userId);
-        console.log("user Data:", userData);
-        localStorage.setItem("user", JSON.stringify(userData));
-        localStorage.setItem("userData", "");
-        localStorage.setItem("userLoggedInBefore", "true");
-        setUser(userData);
-
-        setLoggedIn(true);
-        setLoginError("");
-        navigate("/");
-        console.log(data.message);
-      } else {
-        setLoginError(data.message);
-        console.log(data.message);
-      }
-    } catch (error) {
-      console.error("Error is:", error);
-    }
-
-    const handleSignUpWithGoogle = () => {
-      // TODO: Google SIGN UP HERE
-      console.log("Google Sign Up");
-    };
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Reset errors before validation
-    setErrors({});
-
-    // Validate email format using a regular expression
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setErrors((prevState) => ({
-        ...prevState,
-        email: "Invalid email format!",
-      }));
-      return;
-    }
-
-    // Checks password length
-    if (password.length < 8) {
-      setErrors((prevState) => ({
-        ...prevState,
-        password: "Password must be at least 8 characters long.",
-      }));
-      return;
-    }
-
-    // Checks if first name, last name, and username contain numbers
-    if (/\d/.test(firstName) || /\d/.test(lastName)) {
-      setErrors((prevState) => ({
-        ...prevState,
-        numeric: "First name and last name cannot contain numbers.",
-      }));
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setErrors((prevState) => ({
-        ...prevState,
-        confirmPassword: "Passwords do not match.",
-      }));
-      return;
-    }
-
-    // Perform registration logic
-    handleRegistrationSubmit({
+    const result = await handleRegistrationSubmit({
       email,
+      password,
       firstName,
       lastName,
-      password,
       phoneNumber,
+      setLoggedIn,
+      setUser,
+      setLoginError,
+      navigate,
+      setOtpSent,
+      BASE_URL,
     });
-    setErrors({});
+
+    if (result.success) {
+      setErrors({});
+    } else {
+      setErrors({ submit: result.message });
+    }
   };
 
   return (
     <div className="p-4 w-full max-w-[400px] mx-auto mt-10">
-      <div className="p-4">
-        <h1 className="text-2xl mb-3 font-bold text-blue-500 text-center">
-          Register Here
-        </h1>
-        <h4 className="text-xl mb-6 font-bold text-blue-500 text-center">
-          Welcome to TAMAHealth
-        </h4>
-        <hr />
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 min-h-[300px] overflow-y-auto"
-        >
-          <div className="mb-4 mt-4">
-            <label className="text-black">First Name</label>
-            <input
-              name="firstName"
-              type="text"
-              placeholder="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-              className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="text-black">Last Name</label>
-            <input
-              name="lastName"
-              type="text"
-              placeholder="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-              className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="text-black">Email</label>
-            <input
-              name="email"
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="text-black">Password</label>
-            <input
-              name="password"
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="text-black">Confirm Password</label>
-            <input
-              name="confirmPassword"
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="text-black">Phone Number</label>
-            <input
-              name="phoneNumber"
-              type="tel"
-              placeholder="Phone Number"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
-              className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
-            />
-          </div>
-          {Object.values(errors).map((error) => (
-            <p className="text-red-500" key={error}>
-              {error}
-            </p>
-          ))}
-          <button
-            className="bg-blue-500 hover:bg-blue-400 text-white py-2 px-4 rounded mb-8 w-full"
-            type="submit"
-          >
-            Register
-          </button>
-        </form>
-        <div className="mt-10 text-center">
-          <button className="bg-blue-500 text-white hover:bg-blue-400 px-4 py-2 rounded mx-auto">
-            <FontAwesomeIcon icon={faGoogle} className="mr-2" />
-            Continue with Google
-          </button>
-        </div>
-        <div className="text-center mt-5 mb-14">
-          <span>Already have an account? </span>
-          <a href="/login" className="text-blue-500 hover:underline">
-            Login
-          </a>
-        </div>
+      <h1 className="text-2xl mb-3 font-bold text-blue-500 text-center">
+        Register Here
+      </h1>
+      <h4 className="text-xl mb-6 font-bold text-blue-500 text-center">
+        Welcome to TAMAHealth
+      </h4>
+      <hr />
+      <FormComponent
+        firstName={firstName}
+        setFirstName={setFirstName}
+        lastName={lastName}
+        setLastName={setLastName}
+        password={password}
+        setPassword={setPassword}
+        confirmPassword={confirmPassword}
+        setConfirmPassword={setConfirmPassword}
+        email={email}
+        setEmail={setEmail}
+        phoneNumber={phoneNumber}
+        setPhoneNumber={setPhoneNumber}
+        handleSubmit={handleSubmit}
+        errors={errors}
+        setLoginError={setLoginError}
+      />
+
+      <div className="mt-10 text-center">
+        <button className="bg-blue-500 text-white hover:bg-blue-400 px-4 py-2 rounded mx-auto">
+          <FontAwesomeIcon icon={faGoogle} className="mr-2" />
+          Continue with Google
+        </button>
+      </div>
+      <div className="text-center mt-5 mb-14">
+        <span>Already have an account? </span>
+        <a href="/login" className="text-blue-500 hover:underline">
+          Login
+        </a>
       </div>
     </div>
   );
