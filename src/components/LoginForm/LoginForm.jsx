@@ -116,7 +116,7 @@ export default function LoginForm({
     }
   };
 
-  // I will check it later
+  // fixed it!
   const handlePasswordChange = (event) => {
     if (passwordError === true) {
       setPasswordError(false);

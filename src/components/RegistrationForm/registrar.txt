@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import jwtDecode from "jwt-decode";
-import "./RegistrationForm.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 
@@ -10,9 +10,7 @@ export default function RegistrationForm({
   setLoggedIn,
   setUser,
   setLoginError,
-  user,
 }) {
-  const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
@@ -20,6 +18,33 @@ export default function RegistrationForm({
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [errors, setErrors] = useState({});
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+
+  // define navigate function
+  const navigate = useNavigate();
+
+  const sendOtp = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/auth/send-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        return { success: true };
+      } else {
+        return { success: false, message: data.message };
+      }
+    } catch (error) {
+      console.error("Error in sending OTP:", error);
+      return { success: false, message: "Failed to send OTP" };
+    }
+  };
 
   const handleRegistrationSubmit = async ({
     email,
@@ -64,8 +89,16 @@ export default function RegistrationForm({
 
         setLoggedIn(true);
         setLoginError("");
-        navigate("/");
+        navigate("/home");
         console.log(data.message);
+        const otpResponse = await sendOtp();
+        if (otpResponse.success) {
+          setOtpSent(true);
+          navigate("/otp-verification");
+        } else {
+          console.log("OTP not sent", otpResponse.message);
+          setLoginError(otpResponse.message);
+        }
       } else {
         setLoginError(data.message);
         console.log(data.message);
@@ -106,10 +139,10 @@ export default function RegistrationForm({
     }
 
     // Checks if first name, last name, and username contain numbers
-    if (/\d/.test(firstName) || /\d/.test(lastName) || /\d/.test(username)) {
+    if (/\d/.test(firstName) || /\d/.test(lastName)) {
       setErrors((prevState) => ({
         ...prevState,
-        numeric: "First name, last name, and username cannot contain numbers.",
+        numeric: "First name and last name cannot contain numbers.",
       }));
       return;
     }
@@ -134,92 +167,118 @@ export default function RegistrationForm({
   };
 
   return (
-    <div className="container">
-      <div className="form-container" style={{ height: "105vh" }}>
-        <h1 className="title mt-4">Create an Account</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            required
-            className="input-field"
-          />
-        </div>
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            required
-            className="input-field"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="input-field"
-          />
+    <div className="p-4 w-full max-w-[400px] mx-auto mt-10">
+      <div className="p-4">
+        <h1 className="text-2xl mb-3 font-bold text-blue-500 text-center">
+          Register Here
+        </h1>
+        <h4 className="text-xl mb-6 font-bold text-blue-500 text-center">
+          Welcome to TAMAHealth
+        </h4>
+        <hr />
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 min-h-[300px] overflow-y-auto"
+        >
+          <div className="mb-4 mt-4">
+            <label className="text-black">First Name</label>
+            <input
+              name="firstName"
+              type="text"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+              className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
+            />
           </div>
           <div className="mb-4">
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            className="input-field"
-          />
+            <label className="text-black">Last Name</label>
+            <input
+              name="lastName"
+              type="text"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+              className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
+            />
           </div>
           <div className="mb-4">
-          <input
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="input-field"
-          />
+            <label className="text-black">Email</label>
+            <input
+              name="email"
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
+            />
           </div>
           <div className="mb-4">
-          <input
-            type="tel"
-            placeholder="Phone Number"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            className="input-field"
-          />
+            <label className="text-black">Password</label>
+            <input
+              name="password"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="text-black">Confirm Password</label>
+            <input
+              name="confirmPassword"
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="text-black">Phone Number</label>
+            <div className="flex items-center">
+              <span className="inline-block bg-gray-200 text-gray-700 p-2 rounded-l">
+                +1
+              </span>
+              <input
+                name="phoneNumber"
+                type="tel"
+                placeholder="Phone Number"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+                className="w-full py-2 px-3 border rounded-r text-blue bg-sky-50 flex-1"
+              />
+            </div>
+          </div>
           {Object.values(errors).map((error) => (
             <p className="text-red-500" key={error}>
               {error}
             </p>
           ))}
-          </div>
           <button
+            className="bg-blue-500 hover:bg-blue-400 text-white py-2 px-4 rounded mb-8 w-full"
             type="submit"
-            className="button bg-blue-500 text-black"
           >
             Register
           </button>
         </form>
-        <div className="mt-4 text-center" style={{ marginTop: "7vh" }}>
-          <a href="/register" className="text-black">
-            Create new account
-          </a>
-        </div>
-        <div style={{ marginTop: "3vh" }} className="mb-7 ">
-          <a
-            href="#"
-            // onClick={handleSignUpWithGoogle}
-            className="text-blue-500 hover:underline ml-20"
-          >
+        <div className="mt-10 text-center">
+          <button className="bg-blue-500 text-white hover:bg-blue-400 px-4 py-2 rounded mx-auto">
             <FontAwesomeIcon icon={faGoogle} className="mr-2" />
-            or continue with google
+            Continue with Google
+          </button>
+        </div>
+        <div className="text-center mt-5 mb-14">
+          <span>Already have an account? </span>
+          <a href="/login" className="text-blue-500 hover:underline">
+            Login
           </a>
         </div>
       </div>

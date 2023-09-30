@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+const BASE_URL = import.meta.env.VITE_APP_BASE_URL || "http://localhost:3001";
 
 export default function OTPVerification() {
   const [otp, setOtp] = useState("");
@@ -21,14 +22,14 @@ export default function OTPVerification() {
   // Input checking for OTP
   useEffect(() => {
     const isValidOtp = /^\d+$/.test(otp); // Checks if OTP is all digits
-    setButtonDisabled(!isValidOtp || otp.length < 6); // Assuming OTP is 6 digits
+    setButtonDisabled(!isValidOtp || otp.length < 6); // my otp is 6 digits
   }, [otp]);
 
   // Countdown timer for OTP expiration
   useEffect(() => {
     if (seconds <= 0) {
       setExpired(true);
-      setButtonDisabled(true); // Disable the verify button
+      setButtonDisabled(true); // Disable the verify button after expires
     } else {
       setExpired(false);
     }
@@ -41,18 +42,74 @@ export default function OTPVerification() {
     } else {
       // Reset and show Resend option when time is up
       setExpired(true);
-      setButtonDisabled(true); // Disable the verify button
+      setButtonDisabled(true); // Disable the verify button after expires
     }
   }, [seconds]);
 
-  const verifyOtp = () => {
-    // TODO: Add your OTP verification logic here
-    console.log("Verifying OTP:", otp);
+  const verifyOtp = async () => {
+    // Get the stored phone number from local storage
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const storedPhoneNumber = storedUser ? storedUser.phoneNumber : null;
+
+    const enteredOtp = otp;
+
+    // to ensure that both phoneNumber and OTP are available
+    if (!storedPhoneNumber || !enteredOtp) {
+      console.error("Phone number or OTP is missing");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/auth/otp/verify-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phoneNumber: storedPhoneNumber,
+          code: enteredOtp,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("OTP verified successfully");
+        // Store the token and user data in local storage after successful verification
+        localStorage.setItem("user", JSON.stringify(data.user));
+        navigate("/home");
+      } else {
+        console.log("Failed to verify OTP", data.message);
+      }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+    }
   };
 
-  const resendCode = () => {
-    // TODO: Resend the OTP
-    setSeconds(180); // Reset the timer
+  //it doesn't work for now I just did it initially
+  const resendCode = async () => {
+    try {
+      const response = await fetch("/api/auth/otp/send-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({ phoneNumber }),
+      });
+
+      if (response.ok) {
+        console.log("OTP sent successfully");
+        setSeconds(180);
+      } else {
+        const data = await response.json();
+        console.log("Failed to resend OTP", data.message);
+      }
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+    }
+
+    setSeconds(180);
   };
 
   return (
