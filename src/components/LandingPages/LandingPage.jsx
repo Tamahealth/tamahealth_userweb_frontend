@@ -1,7 +1,14 @@
 import React from "react";
+import Hero from "./Hero/Hero";
+import Features from "./Features/Features";
+import HowItWorks from "./HowItWorks/HowItWorks";
 
-const LandingPage = () => {
-  return <div>LandingPage</div>;
-};
-
-export default LandingPage;
+export default function LandingPage() {
+  return (
+    <div>
+      <Hero />
+      <Features />
+      <HowItWorks />
+    </div>
+  );
+}
