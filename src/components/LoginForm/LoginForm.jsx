@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import jwtDecode from "jwt-decode";
+import jwt_decode from 'jwt-decode';
+
 import "./LoginForm.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
@@ -123,11 +124,36 @@ export default function LoginForm({
     }
     setPassword(event.target.value);
   };
-
   // the handleSignInWithGoogle function is used to handle the googleAuth sign in button
-  const handleSignInWithGoogle = () => {
-    signInWithGoogle({ setLoggedIn, navigate, setUser });
-  };
+
+  const [users, setUsers] = useState({});
+  function handleCallbackResponse(response) {
+    console.log("Encoded JWT ID token: " + response.credential);
+    var userObject = jwt_decode(response.credential);
+    console.log(userObject);
+    setUsers(userObject);
+    document.getElementById("signInDiv").hidden = true;
+  }
+  function handleSignOut(event) {
+    setUsers({});
+    document.getElementById("signInDiv").hidden = false;
+  }
+
+  useEffect(() => {
+    google.accounts.id.initialize({
+      client_id:
+        "29615793318-fls49hm91df7s458sr34jn82fu49k9ti.apps.googleusercontent.com",
+      callback: handleCallbackResponse, // Corrected function name
+    });
+    google.accounts.id.renderButton(document.getElementById("signInDiv"), {
+      theme: "outline",
+      size: "large",
+    });
+  }, []);
+  // if (Object.keys(users).length !== 0) {
+  //   Navigate('/register'); // Redirect to the "/home" route
+  // }
+  //end of google login
 
   // signIn handler based on login option
   const handleSignIn = (e) => {
@@ -263,13 +289,15 @@ export default function LoginForm({
           )}
         </form>
         <div className="mt-4 text-center">
-          <button
-            onClick={handleSignInWithGoogle}
-            className="bg-blue-500 text-white hover:bg-blue-400 px-4 py-2 rounded mx-auto"
-          >
-            <FontAwesomeIcon icon={faGoogle} className="mr-2" />
-            Continue with Google
-          </button>
+        <div className="App">
+        <div id="signInDiv"></div>
+        {Object.keys(users).length !== 0 && (
+          // <button onClick={(e) => handleSignOut(e)}>Sign Out</button>
+          // <a href="/register" className="text-blue-500 hover:underline">hi</a>
+          window.location = '/register' 
+        )}
+        
+      </div>
         </div>
         <div className="text-center mt-4">
           <span>Don't have an account? </span>
