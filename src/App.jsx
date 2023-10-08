@@ -1,7 +1,5 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import jwt_decode from "jwt-decode";
-import { redirect, useNavigate } from "react-router-dom";
 import {
   BrowserRouter as Router,
   Routes,
@@ -11,7 +9,7 @@ import {
 import "./App.css";
 import LoginForm from "./components/LoginForm/LoginForm";
 import RegistrationForm from "./components/RegistrationForm/RegistrationForm";
-import AuthenticatedLandingPage from "./components/LandingPages/AuthenticatedLandingPage";
+import AuthenticatedLandingPage from "./components/AuthenticatedLandingPage/AuthenticatedLandingPage";
 import LandingPage from "./components/LandingPages/LandingPage";
 import PrivateRoute from "./PageContainer";
 import ContactUs from "./components/ContactUs/ContactUs";
@@ -24,7 +22,6 @@ export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [logginError, setLoginError] = useState("");
-
   // State for userData
   const [userData, setUserData] = useState({});
 
@@ -44,19 +41,21 @@ export default function App() {
     }
   }, []);
 
-  
   return (
-    <>
-      
-      <div>
-        <Router forceRefresh={true} basename="/">
-          <NavBar
-            loggedIn={loggedIn}
-            user={user}
-            setLoggedIn={setLoggedIn}
-            setUser={setUser}
-            setLoginError={setLoginError}
-          />
+    <div className="app-container">
+      {" "}
+      {/* Use the app-container class you've defined */}
+      <Router forceRefresh={true} basename="/">
+        <NavBar
+          loggedIn={loggedIn}
+          user={user}
+          setLoggedIn={setLoggedIn}
+          setUser={setUser}
+          setLoginError={setLoginError}
+        />
+        <div className="content-wrapper">
+          {" "}
+          {/* Use the content-wrapper class you've defined */}
           <Routes>
             <Route
               path="/"
@@ -111,9 +110,10 @@ export default function App() {
             <Route path="/ContactUs" element={<ContactUs />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <Footer />
-        </Router>
-      </div>
-    </>
+        </div>
+        <Footer className="footer" />{" "}
+        {/* Use the footer class you've defined */}
+      </Router>
+    </div>
   );
 }

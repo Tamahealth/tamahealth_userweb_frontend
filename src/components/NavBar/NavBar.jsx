@@ -80,10 +80,10 @@ export default function NavBar({
         ) : (
           <div className="hidden md:flex space-x-4">
             <Link
-              to="/register"
+              to="/login"
               className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded"
             >
-              Register
+              Login
             </Link>
           </div>
         )}

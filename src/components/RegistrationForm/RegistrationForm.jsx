@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import jwtDecode from "jwt-decode";
 import FormComponent from "./RegForm";
 import { handleRegistrationSubmit, sendOtp } from "./RegistrationFunctions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
