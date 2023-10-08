@@ -9,9 +9,9 @@ import {
   TruckIcon,
 } from "@heroicons/react/outline";
 
-export default function HowItWorks() {
+export default function HowItWorks({ howItWorksSection }) {
   return (
-    <div className="bg-gray-50 py-20 px-6 md:px-20">
+    <div id={howItWorksSection} className="bg-gray-50 py-20 px-6 md:px-20">
       <h2 className="text-center text-3xl md:text-4xl font-semibold text-blue-500 mb-16">
         How It Works
       </h2>

@@ -1,0 +1,308 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import jwt_decode from "jwt-decode";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
+const BASE_URL = import.meta.env.VITE_APP_BASE_URL || "http://localhost:3001";
+
+const stylesDesktop = {
+  container: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+  },
+  formContainer: {
+    width: "25%",
+    padding: "2rem",
+    textAlign: "center",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    borderRadius: "8px",
+  },
+};
+
+// Style for mobile screens
+const stylesMobile = {
+  container: {
+    padding: "1rem",
+    width: "100%",
+  },
+  formContainer: {
+    padding: "1rem",
+  },
+};
+
+export default function LoginForm({
+  setUser,
+  setLoggedIn,
+  setLoginError,
+  setUserData,
+}) {
+  // the useState hook is used to create state variables
+  const [credential, setCredential] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
+  const [loginOption, setLoginOption] = useState("email");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpValue, setOtpValue] = useState("");
+
+  // the useNavigate hook is used for navigating between pages
+  const navigate = useNavigate();
+
+  // usestate for styling mobile screens
+  const isMobile = window.innerWidth <= 768;
+  const styles = isMobile ? stylesMobile : stylesDesktop;
+
+  // useEffect hook is used to run code when the component is mounted
+  useEffect(() => {
+    if (loginOption === "email") {
+      setCredential(email);
+    } else {
+      setCredential(phone);
+    }
+  }, [email, phone, loginOption]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    if (token && user) {
+      setLoggedIn(true);
+      setUser(JSON.parse(user));
+    }
+  }, []);
+
+  // the handleLoginSubmit function is used to handle the login form submission
+  const handleLoginSubmit = async ({ credential, password }) => {
+    let isEmail = credential.includes("@");
+    let requestBody = isEmail
+      ? { email: credential, password }
+      : { phoneNumber: credential, password };
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const token = data.token;
+        const decodedToken = jwtDecode(token);
+        localStorage.setItem("token", token);
+        localStorage.setItem("userId", decodedToken.userId);
+        const userData = {
+          ...decodedToken,
+          email: decodedToken.email,
+          fullName: `${decodedToken.firstName} ${decodedToken.lastName}`,
+        };
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUserData(userData);
+        setLoggedIn(true);
+        setLoginError("");
+        window.location.href = "/";
+      } else {
+        setLoginError(data.message);
+        setPasswordError(true);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  // fixed it!
+  const handlePasswordChange = (event) => {
+    if (passwordError === true) {
+      setPasswordError(false);
+    }
+    setPassword(event.target.value);
+  };
+  // the handleSignInWithGoogle function is used to handle the googleAuth sign in button
+
+  const [users, setUsers] = useState({});
+  function handleCallbackResponse(response) {
+    console.log("Encoded JWT ID token: " + response.credential);
+    var userObject = jwt_decode(response.credential);
+    console.log(userObject);
+    setUsers(userObject);
+    document.getElementById("signInDiv").hidden = true;
+  }
+  function handleSignOut(event) {
+    setUsers({});
+    document.getElementById("signInDiv").hidden = false;
+  }
+
+  useEffect(() => {
+    google.accounts.id.initialize({
+      client_id:
+        "29615793318-fls49hm91df7s458sr34jn82fu49k9ti.apps.googleusercontent.com",
+      callback: handleCallbackResponse, // Corrected function name
+    });
+    google.accounts.id.renderButton(document.getElementById("signInDiv"), {
+      theme: "outline",
+      size: "large",
+    });
+  }, []);
+  // if (Object.keys(users).length !== 0) {
+  //   Navigate('/register'); // Redirect to the "/home" route
+  // }
+  //end of google login
+
+  // signIn handler based on login option
+  const handleSignIn = (e) => {
+    e.preventDefault();
+    let isEmail = loginOption === "email";
+    let activeCredential = isEmail ? email : phone;
+    handleLoginSubmit({
+      credential: activeCredential,
+      password,
+    });
+  };
+
+  const handleOtpSubmit = async (e) => {
+    // logic
+  };
+
+  return (
+    <div className="p-4 w-full max-w-[400px] mx-auto mt-10">
+      <div className="p-4">
+        <h1 className="text-2xl mb-3 font-bold text-blue-500 text-center">
+          Login Here
+        </h1>
+        <h4 className="text-xl mb-6 font-bold text-blue-500 text-center">
+          Welcome to TAMAHealth
+        </h4>
+        <hr />
+        <div className="flex justify-center mb-4">
+          <button
+            className={`py-2 px-4 mx-2 ${
+              loginOption === "email" ? "bg-gray-200" : "bg-white"
+            }`}
+            onClick={() => setLoginOption("email")}
+          >
+            Email
+          </button>
+          <button
+            className={`py-2 px-4 mx-2 ${
+              loginOption === "phone" ? "bg-gray-200" : "bg-white"
+            }`}
+            onClick={() => setLoginOption("phone")}
+          >
+            Phone
+          </button>
+        </div>
+        <form
+          onSubmit={handleSignIn}
+          className="space-y-4 h-[300px] overflow-y-auto"
+        >
+          {loginOption === "email" ? (
+            <>
+              <div className="mb-4">
+                <div className="text-left">
+                  <label className="text-black">Email</label>
+                </div>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
+                />
+              </div>
+              <div className="mb-4">
+                <div className="text-left">
+                  <label className="text-black">Password</label>
+                </div>
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  requiredrfg="true"
+                  className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
+                />
+                <div className="text-right mb-4 mt-4">
+                  <a href="#" className="text-blue-600 hover:underline">
+                    Forgot Password?
+                  </a>
+                </div>
+                <button
+                  className="bg-blue-500 hover:bg-blue-400 text-white py-2 px-4 rounded mt-4 w-full"
+                  type="submit"
+                >
+                  Sign In with Email
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="mb-4">
+                <label className="text-black !important">Phone Number</label>
+                <input
+                  type="tel"
+                  placeholder="Phone Number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                  pattern="[+1]{0,2}[0-9]{10}"
+                  autoComplete="tel"
+                  className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
+                />
+                {!otpSent ? (
+                  <button
+                    onClick={() => {
+                      setOtpSent(true);
+                      // Logic to send OTP
+                    }}
+                    className="bg-blue-500 hover:bg-blue-400 text-white py-2 px-4 rounded mt-4 w-full"
+                  >
+                    Send Code
+                  </button>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="Enter OTP"
+                      value={otpValue}
+                      onChange={(e) => setOtpValue(e.target.value)}
+                      className="w-full py-2 px-3 border rounded text-blue bg-sky-50"
+                    />
+                    <button
+                      onClick={handleOTPSubmit}
+                      className="bg-blue-500 hover:bg-blue-400 text-white py-2 px-4 rounded mt-4 w-full"
+                    >
+                      Verify OTP
+                    </button>
+                  </>
+                )}
+              </div>
+            </>
+          )}
+        </form>
+        <div className="mt-4 text-center">
+          <div className="App">
+            <div id="signInDiv"></div>
+            {Object.keys(users).length !== 0 &&
+              // <button onClick={(e) => handleSignOut(e)}>Sign Out</button>
+              // <a href="/register" className="text-blue-500 hover:underline">hi</a>
+              (window.location = "/register")}
+          </div>
+        </div>
+        <div className="text-center mt-4">
+          <span>Don't have an account? </span>
+          <a href="/register" className="text-blue-500 hover:underline">
+            Sign up
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
