@@ -9,7 +9,7 @@ import {
 import "./App.css";
 import LoginForm from "./components/LoginForm/LoginForm";
 import RegistrationForm from "./components/RegistrationForm/RegistrationForm";
-import AuthenticatedLandingPage from "./components/AuthenticatedLandingPage/AuthenticatedLandingPage";
+import  AuthenticatedLandingPage from "./components/AuthenticatedLandingPage/AuthenticatedLandingPage";
 import LandingPage from "./components/LandingPages/LandingPage";
 import PrivateRoute from "./PageContainer";
 import ContactUs from "./components/ContactUs/ContactUs";
