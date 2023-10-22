@@ -26,7 +26,7 @@ export default function AuthenticatedHero({ user }) {
         <button
           className="border border-white text-white px-6 py-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 z-10 hover:bg-white hover:text-blue-900"
           onClick={() => {
-            window.location.href = "/submit-prescription";
+            window.location.href = "/prescription";
           }}
         >
           Submit Your Prescription

@@ -14,7 +14,7 @@ export default function LoginForm({ setLoginError, setUserData, setLoggedIn }) {
           Login Here
         </h1>
         <h4 className="text-xl mb-6 font-bold text-blue-500 text-center">
-          Welcome to TAMAHealth
+          Welcome to Todo
         </h4>
         <hr />
 
