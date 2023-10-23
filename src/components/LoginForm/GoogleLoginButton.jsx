@@ -1,50 +1,56 @@
 import React, { useState, useEffect } from "react";
 import jwt_decode from "jwt-decode";
 
-function GoogleLoginButton() {
+const BASE_URL = import.meta.env.VITE_APP_BASE_URL || "http://localhost:3001";
+
+export default function GoogleLoginButton({ setUserData, setLoggedIn }) {
   const [users, setUsers] = useState({});
 
-  // const googleAuth = () => {
-  //   window.open("${process.env.REACT_API_URL}/auth/google/callback", "_self");
-  // };
+  async function handleCallbackResponse(response, setUserData, setLoggedIn) {
+    try {
+      if (!response.credential) {
+        throw new Error("No token received from Google");
+      }
 
-  async function handleCallbackResponse(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
-    const userObject = jwt_decode(response.credential);
-    console.log(userObject);
-    setUsers(userObject);
-    const email = userObject.email;
-    const emailResponse = await fetch('http://localhost:3001/api/verify-email', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({ email }),
-});
+      const userObject = jwt_decode(response.credential);
 
-  
-    if (emailResponse.ok) {
-      const data = await emailResponse.json();
-      console.log(data.message);
-    } else {
-      console.log('Email not found in the database');
-     
+      const emailResponse = await fetch(`${BASE_URL}/api/auth/verify-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: userObject.email }),
+      });
+
+      if (emailResponse.ok) {
+        const data = await emailResponse.json();
+        const decodedToken = jwt_decode(data.token);
+
+        // Handling user login, similar to email method
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userId", decodedToken.userId);
+        const userData = {
+          ...decodedToken,
+          email: decodedToken.email,
+          fullName: `${decodedToken.firstName} ${decodedToken.lastName}`,
+        };
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUserData(userData);
+        setLoggedIn(true);
+        window.location.href = "/";
+      } else {
+        window.location.href = "/register";
+      }
+    } catch (error) {
+      console.log("An error occurred: ", error);
     }
-    document.getElementById("signInDiv").hidden = true; // Always hide the sign-in button
   }
-  
-  
-
-  function handleSignOut(event) {
-    setUsers({});
-    document.getElementById("signInDiv").hidden = false;
-  }
-
   useEffect(() => {
     google.accounts.id.initialize({
       client_id:
         "274539974663-pg594q2mj3q24t31q60gor6d5oa72qdu.apps.googleusercontent.com",
-      callback: handleCallbackResponse,
+      callback: (response) =>
+        handleCallbackResponse(response, setUserData, setLoggedIn),
     });
     google.accounts.id.renderButton(document.getElementById("signInDiv"), {
       theme: "outline",
@@ -54,18 +60,7 @@ function GoogleLoginButton() {
 
   return (
     <div className="App">
-      {/* <button  onClick ={googleAuth}>
-          {/* <img src="./images/google.png" alt="google icon" /> */}
-          {/* <span>Sign up with Google</span>
-          </button> */}
       <div id="signInDiv"></div>
-      {Object.keys(users).length !== 0 && (
-        // Uncomment below if you want to show a Sign Out button
-        <button onClick={(e) => handleSignOut(e)}>Sign Out</button>
-      )}
-      {/* Add any additional rendering logic based on user state here */}
     </div>
   );
 }
-
-export default GoogleLoginButton;
