@@ -51,7 +51,10 @@ export default function LoginForm({ setLoginError, setUserData, setLoggedIn }) {
           />
         )}
 
-        <GoogleLoginButton />
+        <GoogleLoginButton
+          setUserData={setUserData}
+          setLoggedIn={setLoggedIn}
+        />
 
         <SignUpPrompt />
       </div>
