@@ -13,6 +13,7 @@ export default function GoogleLoginButton({ setUserData, setLoggedIn }) {
       }
 
       const userObject = jwt_decode(response.credential);
+      console.log("Decoded token from Google response:", userObject);
 
       const emailResponse = await fetch(`${BASE_URL}/api/auth/verify-email`, {
         method: "POST",
@@ -24,17 +25,23 @@ export default function GoogleLoginButton({ setUserData, setLoggedIn }) {
 
       if (emailResponse.ok) {
         const data = await emailResponse.json();
-        const decodedToken = jwt_decode(data.token);
+        console.log("Received data from /api/auth/verify-email:", data);
 
-        // Handling user login, similar to email method
+        const decodedToken = jwt_decode(data.token);
+        console.log("Decoded token from /api/auth/verify-email:", decodedToken);
+
         localStorage.setItem("token", data.token);
         localStorage.setItem("userId", decodedToken.userId);
+        console.log("Stored userId:", localStorage.getItem("userId")); // Debugging line
+
         const userData = {
           ...decodedToken,
           email: decodedToken.email,
           fullName: `${decodedToken.firstName} ${decodedToken.lastName}`,
         };
         localStorage.setItem("user", JSON.stringify(userData));
+        console.log("Stored user data:", localStorage.getItem("user")); // Debugging line
+
         setUserData(userData);
         setLoggedIn(true);
         window.location.href = "/";
@@ -45,6 +52,7 @@ export default function GoogleLoginButton({ setUserData, setLoggedIn }) {
       console.log("An error occurred: ", error);
     }
   }
+
   useEffect(() => {
     google.accounts.id.initialize({
       client_id:
