@@ -115,7 +115,7 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
-        <Footer className="footer" />{" "}
+        <Footer className="footer" z/>{" "}
         {/* Use the footer class you've defined */}
       </Router>
     </div>

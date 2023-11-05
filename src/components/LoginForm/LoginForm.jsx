@@ -4,6 +4,9 @@ import PhoneLogin from "./PhoneLogin";
 import GoogleLoginButton from "./GoogleLoginButton";
 import SignUpPrompt from "./SignUpPrompt";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export default function LoginForm({ setLoginError, setUserData, setLoggedIn }) {
   const [loginOption, setLoginOption] = useState("email");
 
@@ -48,6 +51,7 @@ export default function LoginForm({ setLoginError, setUserData, setLoggedIn }) {
             setUserData={setUserData}
             setLoggedIn={setLoggedIn}
             setLoginError={setLoginError}
+            
           />
         )}
 

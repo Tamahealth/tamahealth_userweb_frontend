@@ -2,6 +2,9 @@ import React, { useState } from "react";
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL || "http://localhost:3001";
 import jwt_decode from "jwt-decode";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function PhoneLogin({ setLoggedIn, setUserData, setLoginError }) {
   const [phone, setPhone] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -24,9 +27,15 @@ function PhoneLogin({ setLoggedIn, setUserData, setLoginError }) {
       } else {
         // Handle errors or show a notification for the user
         console.error("Failed to send OTP.");
+        toast.error("Error: Failed to send OTP.", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       }
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Error:", error,{
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
   };
 
@@ -63,9 +72,15 @@ function PhoneLogin({ setLoggedIn, setUserData, setLoginError }) {
       } else {
         // Handle OTP verification failure
         console.error(data.error);
+        toast.error("Error:", data.error,{
+          position: toast.POSITION.TOP_RIGHT,
+        });
       }
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Error:", error,{
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
   };
 

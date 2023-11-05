@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import jwt_decode from "jwt-decode";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL || "http://localhost:3001";
 
 export default function GoogleLoginButton({ setUserData, setLoggedIn }) {
@@ -32,7 +35,7 @@ export default function GoogleLoginButton({ setUserData, setLoggedIn }) {
 
         localStorage.setItem("token", data.token);
         localStorage.setItem("userId", decodedToken.userId);
-        console.log("Stored userId:", localStorage.getItem("userId")); // Debugging line
+        console.log("Stored userId:", localStorage.getItem("userId"));
 
         const userData = {
           ...decodedToken,
@@ -40,16 +43,33 @@ export default function GoogleLoginButton({ setUserData, setLoggedIn }) {
           fullName: `${decodedToken.firstName} ${decodedToken.lastName}`,
         };
         localStorage.setItem("user", JSON.stringify(userData));
-        console.log("Stored user data:", localStorage.getItem("user")); // Debugging line
+        console.log("Stored user data:", localStorage.getItem("user"));
 
         setUserData(userData);
         setLoggedIn(true);
-        window.location.href = "/";
+        toast.success("Google Sign-In Successful", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        setTimeout(() => {
+          window.location.href = "/"; // Redirect to the home page
+        }, 5000);
       } else {
-        window.location.href = "/register";
+        // Handle the redirection to the register page
+
+        toast.error("Error: No account with that email", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        setTimeout(() => {
+          window.location.href = "/register";
+        }, 5000);
       }
     } catch (error) {
       console.log("An error occurred: ", error);
+      setTimeout(() => {
+        toast.error("Google Sign-In Error: " + error, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      }, 5000);
     }
   }
 
@@ -69,6 +89,7 @@ export default function GoogleLoginButton({ setUserData, setLoggedIn }) {
   return (
     <div className="App">
       <div id="signInDiv"></div>
+      <ToastContainer />
     </div>
   );
 }
