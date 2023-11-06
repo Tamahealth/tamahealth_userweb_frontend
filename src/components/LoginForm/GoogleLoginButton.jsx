@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import jwt_decode from "jwt-decode";
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_APP_GOOGLE_CLIENT_ID;
 
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL || "http://localhost:3001";
 
@@ -55,8 +56,7 @@ export default function GoogleLoginButton({ setUserData, setLoggedIn }) {
 
   useEffect(() => {
     google.accounts.id.initialize({
-      client_id:
-        "274539974663-pg594q2mj3q24t31q60gor6d5oa72qdu.apps.googleusercontent.com",
+      client_id: GOOGLE_CLIENT_ID,
       callback: (response) =>
         handleCallbackResponse(response, setUserData, setLoggedIn),
     });
