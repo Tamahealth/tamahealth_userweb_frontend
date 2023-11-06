@@ -1,0 +1,154 @@
+/* styles.css */
+@import 'https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap';
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+
+/* Body styles */
+body {
+  @apply flex items-center justify-center min-h-screen p-10;
+}
+
+/* Container styles */
+.container {
+  @apply max-w-max bg-white w-full p-10 shadow-md;
+}
+
+.container .text {
+  @apply text-4xl font-bold bg-clip-text text-transparent pl-64 bg-gradient-to-r from-blue-500 via-blue-800 to-blue-500;
+}
+.container .texts {
+  @apply text-left text-xl font-bold pt-14 pl-5 bg-gradient-to-r from-blue-400 to-purple-900 bg-clip-text text-transparent;
+}
+
+/* Form styles */
+.container .form-row {
+  @apply flex my-10;
+}
+
+.form-row .input-data {
+  @apply relative w-full h-12 mx-8;
+}
+
+.form-row .textarea {
+  @apply h-72;
+}
+
+.input-data input {
+  @apply w-full h-12 border-none text-base border-b-2 border-gray-300 focus:border-none outline-none; /* Removed the border on focus */
+}
+
+
+
+.input-data input:focus ~ label,
+.input-data input:valid ~ label{
+  @apply transform -translate-y-10 text-blue-500 text-sm ;
+}
+.textarea textarea {
+  @apply w-full border-none text-base outline-none; /* Removed the border and outline on focus */
+  @apply resize-none; /* To prevent textarea resizing */
+  @apply p-2; /* Added some padding to the textarea */
+}
+
+.textarea .input-data {
+  @apply h-0;
+  z-index: -5; /* Adjust the height to center the input */
+}
+
+.textarea textarea:focus ~ label,
+.textarea textarea:valid ~ label {
+  @apply absolute pointer-events-none bottom-0 left-0 transform -translate-y-3 text-blue-500 text-sm; /* Adjust transform to center input vertically */
+  @apply -mb-2; /* Added some negative margin to the label */
+}
+
+
+.input-data label {
+  @apply absolute pointer-events-none bottom-2 left-0 text-base transition-all ease-300;
+}
+
+/* Input with radio styles */
+.input-datas label {
+  @apply flex items-center p-2 space-x-2 text-lg cursor-pointer;
+}
+
+.input-datas input[type="radio"] {
+  @apply opacity-0;
+}
+
+.input-datas .design {
+  @apply w-3 h-3 rounded-full outline-offset-2 outline-2 outline-double mr-2;
+}
+
+.input-datas input[type="radio"]:checked ~ .design {
+  @apply outline-blue-600 bg-blue-500;
+}
+
+.input-datas input[type="radio"]:checked ~ .value {
+  @apply text-blue-600;
+}
+
+/* Underline styles */
+.input-data .underline {
+  @apply absolute bottom-0 left-0 w-full h-0.5 bg-gray-300; /* Decreased the height */
+}
+
+.input-data .underline:before {
+  @apply absolute w-full h-1 bg-blue-500 transform scale-x-0 origin-center transition-transform ease-300;
+}
+
+.input-data input:focus ~ .underline:before,
+.input-data input:valid ~ .underline:before {
+  @apply transform scale-x-100 mb-1; /* Decreased the distance between input and underline */
+}
+
+.textarea textarea:focus ~ .underline:before,
+.textarea textarea:valid ~ .underline:before {
+  @apply transform scale-x-100 mb-2; /* Decreased the distance between input and underline */
+}
+.textarea textarea:focus {
+  @apply -mb-0; /* Move the input up */
+}
+/* Submit button styles */
+.submit-btn .input-data {
+  @apply overflow-hidden h-44 w-24;
+}
+
+.submit-btn .input-data .inner {
+  @apply max-w-3xl h-full absolute left-[-100%] bg-gradient-to-r from-blue-500 to-purple-900 via-purple-600 via-blue-500 transition-all ease-300;
+}
+
+.submit-btn .input-data:hover .inner {
+  @apply left-0;
+}
+
+.submit-btn .input-data input {
+  @apply bg-none border-none text-white text-base font-semibold uppercase tracking-wide cursor-pointer relative z-0;
+}
+
+/* Media query styles */
+@media (max-width: 500px) {
+  .responsive-input {
+    @apply w-full p-10;
+  }
+
+  .container .text {
+    @apply text-3xl;
+  }
+
+  .container form {
+    @apply py-10;
+  }
+
+  .form-row .input-data {
+    @apply flex-1 w-full my-20;
+  }
+  .container form .form-row {
+    @apply block;
+  }
+
+  .form-row .input-data {
+    @apply -my-32;
+  }
+  .submit-btn .input-data {
+    @apply w-40;
+  }
+}

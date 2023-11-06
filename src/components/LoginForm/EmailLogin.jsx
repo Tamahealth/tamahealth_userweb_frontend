@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import jwt_decode from "jwt-decode";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL || "http://localhost:3001";
 
 export default function EmailLogin({
@@ -50,6 +53,9 @@ export default function EmailLogin({
       }
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Error:", error,{
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
   };
 

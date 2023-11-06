@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from 'react';
 
 export default function FormComponent({
   firstName,
@@ -17,6 +17,11 @@ export default function FormComponent({
   setLoginError,
   errors,
 }) {
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
+  const handleCheckboxChange = (e) => {
+    setTermsAccepted(e.target.checked);
+  };
   return (
     <form
       onSubmit={handleSubmit}
@@ -104,12 +109,23 @@ export default function FormComponent({
           {error}
         </p>
       ))}
+      <input
+        type="checkbox"
+        id="termsAndConditions"
+        name="termsAndConditions"
+        value="accepted"
+        onChange={handleCheckboxChange}
+      />
+      <label htmlFor="termsAndConditions">I accept the terms and conditions</label>
+
       <button
-        className="bg-blue-500 hover:bg-blue-400 text-white py-2 px-4 rounded mb-8 w-full"
+        className={`py-2 px-4 rounded mb-8 w-full ${!termsAccepted ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-400'}`}
         type="submit"
+        disabled={!termsAccepted} // Disable the button if terms are not accepted
       >
         Register
       </button>
+      
     </form>
   );
 }

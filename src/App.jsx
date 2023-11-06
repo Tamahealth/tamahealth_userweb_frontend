@@ -9,7 +9,7 @@ import {
 import "./App.css";
 import LoginForm from "./components/LoginForm/LoginForm";
 import RegistrationForm from "./components/RegistrationForm/RegistrationForm";
-import  AuthenticatedLandingPage from "./components/AuthenticatedLandingPage/AuthenticatedLandingPage";
+import AuthenticatedLandingPage from "./components/AuthenticatedLandingPage/AuthenticatedLandingPage";
 import LandingPage from "./components/LandingPages/LandingPage";
 import PrivateRoute from "./PageContainer";
 import ContactUs from "./components/ContactUs/ContactUs";
@@ -19,6 +19,8 @@ import NotFound from "./components/NotFound/NotFound";
 import OTPVerification from "./components/RegistrationForm/OtpVerification";
 import { PrescriptionForm } from "./components/PrescriptionForm";
 import NotesAndReview from "./components/PrescriptionForm/NotesAndReview";
+import PatientAndUpload2 from "./components/PrescriptionForm/PatientAndUpload2";
+import PatientAndUpload3 from "./components/PrescriptionForm/PatientAndUpload3";
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -112,11 +114,18 @@ export default function App() {
             <Route path="/contactUs" element={<ContactUs />} />
             <Route path="/prescription" element={<PrescriptionForm />} />
             <Route path="/reviewPrescription" element={<NotesAndReview />} />
+            <Route
+              path="/prescription/patient-and-upload-2"
+              element={<PatientAndUpload2 />}
+            />
+            <Route
+              path="/prescription/patient-and-upload-3"
+              element={<PatientAndUpload3 />}
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
         <Footer className="footer" />{" "}
-        {/* Use the footer class you've defined */}
       </Router>
     </div>
   );
