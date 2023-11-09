@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { MenuIcon } from "@heroicons/react/solid";
-import { PrescriptionForm } from "../PrescriptionForm/index";
-import NotesAndReview from "../PrescriptionForm/NotesAndReview";
 export default function NavBar({
   loggedIn,
   user,
@@ -81,7 +79,7 @@ export default function NavBar({
         ) : (
           <div className="hidden md:flex space-x-4">
             <Link
-              to="/prescription"
+              to="/login"
               className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded"
             >
               Login

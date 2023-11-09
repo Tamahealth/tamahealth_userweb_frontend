@@ -17,8 +17,9 @@ import NavBar from "./components/NavBar/NavBar";
 import Footer from "./components/Footer/Footer";
 import NotFound from "./components/NotFound/NotFound";
 import OTPVerification from "./components/RegistrationForm/OtpVerification";
-import { PrescriptionForm } from "./components/PrescriptionForm";
-import NotesAndReview from "./components/PrescriptionForm/NotesAndReview";
+import PrescriptionFormContainer from "./components/PrescriptionForm/PrescriptionFormContainer";
+// import NotesAndReview from "./components/PrescriptionForm/NotesAndReview";
+import PatientAndUpload1 from "./components/PrescriptionForm/PatientAndUpload1";
 import PatientAndUpload2 from "./components/PrescriptionForm/PatientAndUpload2";
 import PatientAndUpload3 from "./components/PrescriptionForm/PatientAndUpload3";
 
@@ -112,16 +113,11 @@ export default function App() {
             />
             <Route path="/otp-verification" element={<OTPVerification />} />
             <Route path="/contactUs" element={<ContactUs />} />
-            <Route path="/prescription" element={<PrescriptionForm />} />
-            <Route path="/reviewPrescription" element={<NotesAndReview />} />
             <Route
-              path="/prescription/patient-and-upload-2"
-              element={<PatientAndUpload2 />}
+              path="/prescription/*"
+              element={<PrescriptionFormContainer />}
             />
-            <Route
-              path="/prescription/patient-and-upload-3"
-              element={<PatientAndUpload3 />}
-            />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
