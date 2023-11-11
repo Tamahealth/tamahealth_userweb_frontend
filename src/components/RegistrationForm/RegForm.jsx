@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function FormComponent({
   firstName,
@@ -22,11 +24,21 @@ export default function FormComponent({
   const handleCheckboxChange = (e) => {
     setTermsAccepted(e.target.checked);
   };
+
+  const showToast = (message, type) => {
+    if (type === 'success') {
+      toast.success(message, { position: toast.POSITION.TOP_RIGHT });
+    } else if (type === 'error') {
+      toast.error(message, { position: toast.POSITION.TOP_RIGHT });
+    }
+  };
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 min-h-[300px] overflow-y-auto"
-    >
+    <div>
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 min-h-[300px] overflow-y-auto"
+      >
       <div className="mb-4 mt-4">
         <label className="text-black">First Name</label>
         <input
@@ -119,13 +131,18 @@ export default function FormComponent({
       <label htmlFor="termsAndConditions">I accept the terms and conditions</label>
 
       <button
-        className={`py-2 px-4 rounded mb-8 w-full ${!termsAccepted ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-400'}`}
-        type="submit"
-        disabled={!termsAccepted} // Disable the button if terms are not accepted
-      >
-        Register
-      </button>
-      
-    </form>
+          className={`py-2 px-4 rounded mb-8 w-full ${
+            !termsAccepted ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-400'
+          }`}
+          type="submit"
+          disabled={!termsAccepted} // Disable the button if terms are not accepted
+          onClick={() => showToast('Registration successful', 'success')}
+        >
+          Register
+        </button>
+      </form>
+
+      <ToastContainer />
+    </div>
   );
 }

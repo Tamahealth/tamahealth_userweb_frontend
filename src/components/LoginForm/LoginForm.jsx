@@ -10,6 +10,18 @@ import "react-toastify/dist/ReactToastify.css";
 export default function LoginForm({ setLoginError, setUserData, setLoggedIn }) {
   const [loginOption, setLoginOption] = useState("email");
 
+  const handleEmailLoginError = () => {
+    toast.error("Email login error", {
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  };
+
+  const handlePhoneLoginError = () => {
+    toast.error("Phone login error", {
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  };
+
   return (
     <div className="p-4 w-full max-w-[400px] mx-auto mt-10">
       <div className="p-4">
@@ -42,16 +54,15 @@ export default function LoginForm({ setLoginError, setUserData, setLoggedIn }) {
 
         {loginOption === "email" ? (
           <EmailLogin
-            setLoginError={setLoginError}
             setUserData={setUserData}
             setLoggedIn={setLoggedIn}
+            onError={handleEmailLoginError}
           />
         ) : (
           <PhoneLogin
             setUserData={setUserData}
             setLoggedIn={setLoggedIn}
-            setLoginError={setLoginError}
-            
+            onError={handlePhoneLoginError}
           />
         )}
 

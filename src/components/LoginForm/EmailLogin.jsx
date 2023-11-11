@@ -46,9 +46,16 @@ export default function EmailLogin({
         setUserData(userData);
         setLoggedIn(true);
         setLoginError("");
-        window.location.href = "/";
+        toast.success("Sign-In Successful", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 5000);
       } else {
-        setLoginError(data.message);
+        toast.error(data.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
         setPasswordError(true);
       }
     } catch (error) {
@@ -61,7 +68,8 @@ export default function EmailLogin({
 
   const handlePasswordChange = (event) => {
     if (passwordError) {
-      setPasswordError(false);
+      setPasswordError(false);    
+      toast.error('Invalid password!');  
     }
     setPassword(event.target.value);
   };
