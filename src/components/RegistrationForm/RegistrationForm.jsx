@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import FormComponent from "./RegForm";
 import { handleRegistrationSubmit, sendOtp } from "./RegistrationFunctions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -38,8 +40,18 @@ export default function MainComponent({ setLoggedIn, setUser }) {
 
     if (result.success) {
       setErrors({});
+      showToast("Registration successful", "success");
     } else {
       setErrors({ submit: result.message });
+      showToast("Registration failed", "error");
+    }
+  };
+
+  const showToast = (message, type) => {
+    if (type === "success") {
+      toast.success(message, { position: toast.POSITION.TOP_RIGHT });
+    } else if (type === "error") {
+      toast.error(message, { position: toast.POSITION.TOP_RIGHT });
     }
   };
 
@@ -82,6 +94,8 @@ export default function MainComponent({ setLoggedIn, setUser }) {
           Login
         </a>
       </div>
+
+      <ToastContainer />
     </div>
   );
 }

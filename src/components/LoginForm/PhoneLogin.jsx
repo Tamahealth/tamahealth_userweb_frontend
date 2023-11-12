@@ -24,8 +24,10 @@ function PhoneLogin({ setLoggedIn, setUserData, setLoginError }) {
 
       if (response.ok) {
         setOtpSent(true);
+        toast.success("OTP sent successfully", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       } else {
-        // Handle errors or show a notification for the user
         console.error("Failed to send OTP.");
         toast.error("Error: Failed to send OTP.", {
           position: toast.POSITION.TOP_RIGHT,
@@ -33,7 +35,7 @@ function PhoneLogin({ setLoggedIn, setUserData, setLoginError }) {
       }
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Error:", error,{
+      toast.error("Error:", error, {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
@@ -68,17 +70,19 @@ function PhoneLogin({ setLoggedIn, setUserData, setLoginError }) {
         setLoggedIn(true);
         setLoginError("");
         window.location.href = "/home";
-        console.log(data.message);
+        toast.success("Logged in successfully", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       } else {
         // Handle OTP verification failure
         console.error(data.error);
-        toast.error("Error:", data.error,{
+        toast.error("Error:", data.error, {
           position: toast.POSITION.TOP_RIGHT,
         });
       }
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Error:", error,{
+      toast.error("Error:", error, {
         position: toast.POSITION.TOP_RIGHT,
       });
     }

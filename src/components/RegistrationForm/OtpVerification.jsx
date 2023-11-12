@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL || "http://localhost:3001";
 
 export default function OTPVerification() {
@@ -78,15 +81,23 @@ export default function OTPVerification() {
         // Store the token and user data in local storage after successful verification
         localStorage.setItem("user", JSON.stringify(data.user));
         navigate("/home");
+        toast.success("OTP verified successfully", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       } else {
         console.log("Failed to verify OTP", data.message);
+        toast.error(data.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
+      toast.error("Error verifying OTP", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
   };
 
-  //it doesn't work for now I just did it initially
   const resendCode = async () => {
     try {
       const response = await fetch("/api/auth/otp/send-otp", {
@@ -94,19 +105,27 @@ export default function OTPVerification() {
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({ phoneNumber }),
       });
 
       if (response.ok) {
         console.log("OTP sent successfully");
         setSeconds(180);
+        toast.success("OTP sent successfully", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       } else {
         const data = await response.json();
         console.log("Failed to resend OTP", data.message);
+        toast.error(data.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       }
     } catch (error) {
       console.error("Error resending OTP:", error);
+      toast.error("Error resending OTP", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
 
     setSeconds(180);
@@ -114,9 +133,9 @@ export default function OTPVerification() {
 
   return (
     <div className="p-4 w-full max-w-[400px] mx-auto mt-10 mb-10 md:mb-0">
-      {" "}
+      <ToastContainer />
       {/* Margin bottom added for mobile */}
-      <h1 className="text-2xl mb-3 font-bold text-blue-500 text-center">
+      <h1 className="text-2xl mb-3 font-boldtext-blue-500 text-center">
         Verify Your Code
       </h1>
       <p className="text-center mb-4">
