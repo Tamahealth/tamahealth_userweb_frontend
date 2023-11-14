@@ -37,6 +37,9 @@ const PatientAndUpload1 = () => {
               type="text"
               id="first-name"
               placeholder="First Name"
+              name="PatientFirstName"
+              value={formData.PatientFirstName || ""}
+              onChange={handleChange}
             />
           </div>
           <div className="mb-6 md:mb-0">
@@ -51,6 +54,9 @@ const PatientAndUpload1 = () => {
               type="text"
               id="last-name"
               placeholder="Last Name"
+              name="PatientLastName"
+              value={formData.PatientLastName || ""}
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -67,6 +73,9 @@ const PatientAndUpload1 = () => {
               type="date"
               id="birthdate"
               placeholder="mm/dd/yyyy"
+              name="PatientBirthDate"
+              value={formData.PatientBirthDate || ""}
+              onChange={handleChange}
             />
           </div>
           <div className="mb-6 md:mb-0 md:col-span-1">
@@ -81,6 +90,9 @@ const PatientAndUpload1 = () => {
               type="number"
               id="age"
               placeholder="Age"
+              name="PatientAge"
+              value={formData.PatientAge || ""}
+              onChange={handleChange}
             />
           </div>
           <div className="flex flex-col md:flex-row justify-center gap-4">
@@ -96,8 +108,9 @@ const PatientAndUpload1 = () => {
                   <input
                     type="radio"
                     className="form-radio"
-                    name="sex"
-                    value="male"
+                    name="PatientSex"
+                    value={formData.PatientSex || ""}
+                    onChange={handleChange}
                   />
                   <span className="ml-2">Male</span>
                 </label>
@@ -105,8 +118,9 @@ const PatientAndUpload1 = () => {
                   <input
                     type="radio"
                     className="form-radio"
-                    name="sex"
-                    value="female"
+                    name="PatientSex"
+                    value={formData.PatientSex || ""}
+                    onChange={handleChange}
                   />
                   <span className="ml-2">Female</span>
                 </label>
@@ -127,6 +141,9 @@ const PatientAndUpload1 = () => {
               type="text"
               id="address"
               placeholder="Street Address"
+              name="PatientAddress"
+              value={formData.PatientAddress || ""}
+              onChange={handleChange}
             />
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
@@ -142,6 +159,9 @@ const PatientAndUpload1 = () => {
                 type="text"
                 id="city"
                 placeholder="City"
+                name="PatientCity"
+                value={formData.PatientCity || ""}
+                onChange={handleChange}
               />
             </div>
 
@@ -157,6 +177,9 @@ const PatientAndUpload1 = () => {
                 type="text"
                 id="country"
                 placeholder="Country"
+                name="PatientCountry"
+                value={formData.PatientCountry || ""}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -173,9 +196,14 @@ const PatientAndUpload1 = () => {
             </label>
             <input
               className="shadow appearance-none border-b border-gray-300 focus:outline-none focus:border-blue-500 w-full py-2 px-3 leading-tight"
-              type="text"
+              type="tel"
               id="cellular"
               placeholder="Phone Number"
+              autoComplete="on"
+              htmlFor="tel"
+              name="PatientCellular"
+              value={formData.PatientCellular || ""}
+              onChange={handleChange}
             />
           </div>
         </div>

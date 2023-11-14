@@ -1,14 +1,54 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PrescriptionFormContext } from "./PrescriptionFormContext";
 
 const PatientAndUpload2 = () => {
-  const { formData, updateFormData } = useContext(PrescriptionFormContext);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const {
+    formData,
+    updateFormData,
+    uploadFile,
+    handleFileDeletion,
+    setUploadedFileInfo,
+    uploadedFileInfo,
+    deletionSuccessMessage,
+    deletionErrorMessage,
+  } = useContext(PrescriptionFormContext);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value, files, type } = e.target;
-    updateFormData({ [name]: type === "file" ? files[0] : value });
+  const handleChange = async (e) => {
+    const { name, type, files } = e.target;
+    if (type === "file") {
+      const file = files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+          // Set error message for file size
+          setErrorMessage("File size should be less than 5MB");
+        } else if (
+          !["application/pdf", "image/jpeg", "image/png"].includes(file.type)
+        ) {
+          // Set error message for file type
+          setErrorMessage("Only PDF, JPG, and PNG files are allowed");
+        } else {
+          setErrorMessage(""); // Clear any previous error messages
+          try {
+            const uploadResult = await uploadFile(e);
+            console.log("upload result is", uploadResult);
+            const { fileUrl, fileKey } = uploadResult;
+            setUploadedFileInfo({ fileUrl, fileKey });
+            updateFormData({ ...formData, prescriptionFile: fileUrl }); // Update form data with file URL
+          } catch (uploadError) {
+            // Set error message for upload failure
+            setErrorMessage("File upload failed: " + uploadError.message);
+          }
+        }
+        return; // Exit the function after handling file upload
+      }
+    } else {
+      updateFormData({ [name]: e.target.value });
+      setErrorMessage(""); // Clear any error messages for other inputs
+    }
   };
 
   const handleNextClick = () => {
@@ -37,8 +77,8 @@ const PatientAndUpload2 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              name="prescriber"
-              value={formData.prescriber}
+              name="PrescriberFullName"
+              value={formData.PrescriberFullName}
               onChange={handleChange}
               autoComplete="off"
               required
@@ -52,8 +92,8 @@ const PatientAndUpload2 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              name="occupation"
-              value={formData.occupation}
+              name="PrescriberOccupation"
+              value={formData.PrescriberOccupation}
               onChange={handleChange}
               autoComplete="off"
               required
@@ -71,8 +111,8 @@ const PatientAndUpload2 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              name="prescriberInstitution"
-              value={formData.prescriberInstitution}
+              name="PrescriberInstitution"
+              value={formData.PrescriberInstitution}
               onChange={handleChange}
               autoComplete="off"
               required
@@ -89,8 +129,8 @@ const PatientAndUpload2 = () => {
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
                 type="tel"
-                name="phone1"
-                value={formData.phone1}
+                name="PrescriberPhone"
+                value={formData.PrescriberPhone}
                 onChange={handleChange}
                 pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
                 required
@@ -105,8 +145,8 @@ const PatientAndUpload2 = () => {
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 type="email"
-                name="email"
-                value={formData.email}
+                name="PrescriberEmail"
+                value={formData.PrescriberEmail}
                 onChange={handleChange}
                 required
               />
@@ -126,13 +166,36 @@ const PatientAndUpload2 = () => {
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="prescriptionFile"
             type="file"
-            name="prescriptionFile"
+            name="PrescriptionFile"
             onChange={handleChange}
+            accept=".pdf, image/jpeg, image/png" // Restrict file types
           />
+          {uploadedFileInfo.fileKey && (
+            <div>
+              <a
+                href={uploadedFileInfo.fileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {uploadedFileInfo.fileKey.split("/").pop()}{" "}
+                {/* This will display the file name extracted from the key */}
+              </a>
+              <button onClick={handleFileDeletion}>Remove</button>
+            </div>
+          )}
+
+          {errorMessage && <div className="text-red-500">{errorMessage}</div>}
           <p className="text-gray-600 text-xs mt-2">
             Accepted formats: .pdf, .jpg, .png (Max size: 5MB)
           </p>
+          {deletionSuccessMessage && (
+            <div className="text-green-500">{deletionSuccessMessage}</div>
+          )}
+          {deletionErrorMessage && (
+            <div className="text-red-500">{deletionErrorMessage}</div>
+          )}
         </div>
+
         <div className="mb-6 flex flex-col md:flex-row justify-between w-full">
           {/* Back Button */}
           <div className="mb-4 md:mb-0">

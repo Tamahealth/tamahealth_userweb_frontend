@@ -12,9 +12,11 @@ const PatientAndUpload3 = () => {
   const usStates = new UsaStates();
 
   useEffect(() => {
-    loadUserInfo();
-  }, []);
-  console.log("user infoooooo", userInfo);
+    // Check if userInfo has been loaded
+    if (!userInfo && formData.userId) {
+      loadUserInfo(formData.userId);
+    }
+  }, [formData.userId, userInfo, loadUserInfo]);
 
   if (error) {
     // Render error state
@@ -115,8 +117,8 @@ const PatientAndUpload3 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              name="address"
-              value={formData.address}
+              name="AccountHolderAddress"
+              value={formData.AccountHolderAddress}
               onChange={handleChange}
               required
             />
@@ -129,8 +131,8 @@ const PatientAndUpload3 = () => {
             </label>
             <select
               className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-              name="state"
-              value={formData.state}
+              name="AccountHolderState"
+              value={formData.AccountHolderState}
               onChange={handleChange}
               required
             >
@@ -150,8 +152,8 @@ const PatientAndUpload3 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              name="city"
-              value={formData.city}
+              name="AccountHolderCity"
+              value={formData.AccountHolderCity}
               onChange={handleChange}
               required
             />
@@ -165,8 +167,8 @@ const PatientAndUpload3 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              name="zip"
-              value={formData.zip}
+              name="AccountHolderZipCode"
+              value={formData.AccountHolderZipCode}
               onChange={handleChange}
               required
             />
@@ -196,7 +198,7 @@ const PatientAndUpload3 = () => {
               type="button"
               onClick={handleNextClick}
             >
-              Review and Submit
+              Review to Submit
             </button>
           </div>
         </div>
