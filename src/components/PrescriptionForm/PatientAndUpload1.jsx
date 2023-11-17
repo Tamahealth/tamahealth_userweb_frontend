@@ -36,7 +36,7 @@ const PatientAndUpload1 = () => {
               className="shadow appearance-none border-b border-gray-300 focus:outline-none focus:border-blue-500 w-full py-2 px-3 leading-tight"
               type="text"
               id="first-name"
-              placeholder="First Name"
+              placeholder="Patient's First Name"
               name="PatientFirstName"
               value={formData.PatientFirstName || ""}
               onChange={handleChange}
@@ -53,7 +53,7 @@ const PatientAndUpload1 = () => {
               className="shadow appearance-none border-b border-gray-300 focus:outline-none focus:border-blue-500 w-full py-2 px-3 leading-tight"
               type="text"
               id="last-name"
-              placeholder="Last Name"
+              placeholder="Patient's Last Name"
               name="PatientLastName"
               value={formData.PatientLastName || ""}
               onChange={handleChange}
@@ -109,8 +109,10 @@ const PatientAndUpload1 = () => {
                     type="radio"
                     className="form-radio"
                     name="PatientSex"
-                    value={formData.PatientSex || ""}
+                    value="Male"
                     onChange={handleChange}
+                    checked={formData.PatientSex === "Male"}
+                    required
                   />
                   <span className="ml-2">Male</span>
                 </label>
@@ -119,8 +121,10 @@ const PatientAndUpload1 = () => {
                     type="radio"
                     className="form-radio"
                     name="PatientSex"
-                    value={formData.PatientSex || ""}
+                    value="Female"
                     onChange={handleChange}
+                    checked={formData.PatientSex === "Female"}
+                    required
                   />
                   <span className="ml-2">Female</span>
                 </label>

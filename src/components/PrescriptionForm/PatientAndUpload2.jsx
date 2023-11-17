@@ -51,6 +51,13 @@ const PatientAndUpload2 = () => {
     }
   };
 
+  const extractFileName = (fileKey) => {
+    const [, uuidAndFilename] = fileKey.split("/");
+    const uuidLength = 36;
+    const filename = uuidAndFilename.substring(uuidLength + 1);
+    return filename;
+  };
+
   const handleNextClick = () => {
     navigate("/prescription/patient-and-upload-3");
   };
@@ -155,33 +162,47 @@ const PatientAndUpload2 = () => {
         </div>
 
         {/* File Uploader */}
+        {/* File Uploader */}
         <div className="mb-6 md:max-w-lg">
-          <label
-            htmlFor="prescriptionFile"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
+          <label className="block text-gray-700 text-sm font-bold mb-2">
             Upload Prescription
           </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="prescriptionFile"
-            type="file"
-            name="PrescriptionFile"
-            onChange={handleChange}
-            accept=".pdf, image/jpeg, image/png" // Restrict file types
-          />
-          {uploadedFileInfo.fileKey && (
-            <div>
-              <a
-                href={uploadedFileInfo.fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+          {uploadedFileInfo.fileKey ? (
+            <>
+              <div className="file-name-display">
+                <a
+                  href={uploadedFileInfo.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  {extractFileName(uploadedFileInfo.fileKey)}
+                </a>
+                <button
+                  className="ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={handleFileDeletion}
+                >
+                  Remove
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <label
+                htmlFor="prescriptionFile"
+                className="custom-file-upload py-2 px-4 border border-gray-300 rounded cursor-pointer"
               >
-                {uploadedFileInfo.fileKey.split("/").pop()}{" "}
-                {/* This will display the file name extracted from the key */}
-              </a>
-              <button onClick={handleFileDeletion}>Remove</button>
-            </div>
+                Choose File
+              </label>
+              <input
+                id="prescriptionFile"
+                type="file"
+                name="PrescriptionFile"
+                onChange={handleChange}
+                accept=".pdf, image/jpeg, image/png"
+                style={{ display: "none" }}
+              />
+            </>
           )}
 
           {errorMessage && <div className="text-red-500">{errorMessage}</div>}

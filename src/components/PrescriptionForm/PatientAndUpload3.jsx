@@ -23,6 +23,14 @@ const PatientAndUpload3 = () => {
     return <div>Error loading user information: {error.message}</div>;
   }
 
+  // Ensure userInfo fields are set to prevent uncontrolled/controlled warning
+  const initialUserInfo = {
+    AccountHolderFirstName: userInfo?.AccountHolderFirstName || "",
+    AccountHolderLastName: userInfo?.AccountHolderLastName || "",
+    AccountHolderEmail: userInfo?.AccountHolderEmail || "",
+    AccountHolderPhone: userInfo?.AccountHolderPhone || "",
+  };
+
   // If userInfo is null or undefined, you can render a loading state or nothing
   if (!userInfo) {
     return <div>Loading...</div>;
@@ -67,7 +75,7 @@ const PatientAndUpload3 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 bg-gray-200 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              value={userInfo.AccountHolderFirstName}
+              value={initialUserInfo.AccountHolderFirstName}
               readOnly
             />
           </div>
@@ -79,7 +87,7 @@ const PatientAndUpload3 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 bg-gray-200 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              value={userInfo.AccountHolderLastName}
+              value={initialUserInfo.AccountHolderLastName}
               readOnly
             />
           </div>
@@ -91,7 +99,7 @@ const PatientAndUpload3 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 bg-gray-200 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              value={userInfo.AccountHolderPhone}
+              value={initialUserInfo.AccountHolderPhone}
               readOnly
             />
           </div>
@@ -104,7 +112,7 @@ const PatientAndUpload3 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 bg-gray-200 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="email"
-              value={userInfo.AccountHolderEmail}
+              value={initialUserInfo.AccountHolderEmail}
               readOnly
             />
           </div>
