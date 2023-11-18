@@ -15,9 +15,11 @@ export const PrescriptionFormProvider = ({ children }) => {
   const [deletionSuccessMessage, setDeletionSuccessMessage] = useState("");
   const [deletionErrorMessage, setDeletionErrorMessage] = useState("");
 
-  const [uploadedFileInfo, setUploadedFileInfo] = useState({
-    fileUrl: "",
-    fileKey: "",
+  const [uploadedFileInfo, setUploadedFileInfo] = useState(() => {
+    const localFileData = localStorage.getItem("uploadedFileInfo");
+    return localFileData
+      ? JSON.parse(localFileData)
+      : { fileUrl: "", fileKey: "" };
   });
 
   const [formData, setFormData] = useState(() => {
@@ -61,6 +63,10 @@ export const PrescriptionFormProvider = ({ children }) => {
       const { fileUrl, fileKey } = uploadResult;
       setUploadedFileInfo({ fileUrl, fileKey });
       updateFormData({ prescriptionFileUrl: fileUrl });
+      localStorage.setItem(
+        "uploadedFileInfo",
+        JSON.stringify({ fileUrl, fileKey })
+      );
       return uploadResult;
     } catch (error) {
       setError(error.message);
@@ -96,6 +102,7 @@ export const PrescriptionFormProvider = ({ children }) => {
       if (fileKey) {
         const result = await deletePrescriptionFile(fileKey);
         setUploadedFileInfo({ fileUrl: "", fileKey: "" });
+        localStorage.removeItem("uploadedFileInfo");
         updateFormData({ ...formData, prescriptionFile: "" });
         if (result.success) {
           console.log(result.message);
@@ -103,7 +110,7 @@ export const PrescriptionFormProvider = ({ children }) => {
           setDeletionErrorMessage("");
           // Display a success message
           setDeletionSuccessMessage("File removed successfully.");
-
+          localStorage.removeItem("uploadedFileInfo");
           setTimeout(() => setDeletionSuccessMessage(""), 5000);
         } else {
           console.error(result.error);

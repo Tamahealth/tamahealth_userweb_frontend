@@ -1,10 +1,11 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PrescriptionFormContext } from "./PrescriptionFormContext";
+import { validatePage2From } from "./form-utils/validations";
 
 const PatientAndUpload2 = () => {
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [inputError, setInputError] = useState({});
   const {
     formData,
     updateFormData,
@@ -34,7 +35,7 @@ const PatientAndUpload2 = () => {
           setErrorMessage(""); // Clear any previous error messages
           try {
             const uploadResult = await uploadFile(e);
-            console.log("upload result is", uploadResult);
+            // console.log("upload result is", uploadResult);
             const { fileUrl, fileKey } = uploadResult;
             setUploadedFileInfo({ fileUrl, fileKey });
             updateFormData({ ...formData, prescriptionFile: fileUrl }); // Update form data with file URL
@@ -43,17 +44,30 @@ const PatientAndUpload2 = () => {
             setErrorMessage("File upload failed: " + uploadError.message);
           }
         }
-        return; // Exit the function after handling file upload
+        return;
       }
     } else {
       updateFormData({ [name]: e.target.value });
-      setErrorMessage(""); // Clear any error messages for other inputs
+      setErrorMessage("");
     }
   };
 
-  const handleNextClick = () => {
-    navigate("/prescription/patient-and-upload-3");
+  const extractFileName = (fileKey) => {
+    const [, uuidAndFilename] = fileKey.split("/");
+    const uuidLength = 36;
+    const filename = uuidAndFilename.substring(uuidLength + 1);
+    return filename;
   };
+
+  const handleNextClick = () => {
+    const validationErrors = validatePage2From(formData, uploadedFileInfo);
+    if (Object.keys(validationErrors).length === 0) {
+      navigate("/prescription/patient-and-upload-3");
+    } else {
+      setInputError(validationErrors);
+    }
+  };
+
   const handleBackClick = () => {
     navigate("/prescription/patient-and-upload-1");
   };
@@ -83,6 +97,11 @@ const PatientAndUpload2 = () => {
               autoComplete="off"
               required
             />
+            {inputError.PrescriberFullName && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.PrescriberFullName}
+              </p>
+            )}
           </div>
           {/* Occupation */}
           <div className="mb-6 md:mb-0">
@@ -98,6 +117,11 @@ const PatientAndUpload2 = () => {
               autoComplete="off"
               required
             />
+            {inputError.PrescriberOccupation && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.PrescriberOccupation}
+              </p>
+            )}
           </div>
         </div>
 
@@ -117,6 +141,11 @@ const PatientAndUpload2 = () => {
               autoComplete="off"
               required
             />
+            {inputError.PrescriberInstitution && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.PrescriberInstitution}
+              </p>
+            )}
           </div>
 
           {/* Phone Number and Email */}
@@ -135,6 +164,11 @@ const PatientAndUpload2 = () => {
                 pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
                 required
               />
+              {inputError.PrescriberPhone && (
+                <p className="text-red-500 text-xs italic">
+                  {inputError.PrescriberPhone}
+                </p>
+              )}
             </div>
 
             {/* Email */}
@@ -150,38 +184,62 @@ const PatientAndUpload2 = () => {
                 onChange={handleChange}
                 required
               />
+              {inputError.PrescriberEmail && (
+                <p className="text-red-500 text-xs italic">
+                  {inputError.PrescriberEmail}
+                </p>
+              )}
             </div>
           </div>
         </div>
 
         {/* File Uploader */}
         <div className="mb-6 md:max-w-lg">
-          <label
-            htmlFor="prescriptionFile"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
+          <label className="block text-gray-700 text-sm font-bold mb-2">
             Upload Prescription
           </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="prescriptionFile"
-            type="file"
-            name="PrescriptionFile"
-            onChange={handleChange}
-            accept=".pdf, image/jpeg, image/png" // Restrict file types
-          />
-          {uploadedFileInfo.fileKey && (
-            <div>
-              <a
-                href={uploadedFileInfo.fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+          {uploadedFileInfo.fileKey ? (
+            <>
+              <div className="file-name-display">
+                <a
+                  href={uploadedFileInfo.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  {extractFileName(uploadedFileInfo.fileKey)}
+                </a>
+                <button
+                  className="ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={handleFileDeletion}
+                >
+                  Remove
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <label
+                htmlFor="prescriptionFile"
+                className="custom-file-upload py-2 px-4 border border-gray-300 rounded cursor-pointer"
               >
-                {uploadedFileInfo.fileKey.split("/").pop()}{" "}
-                {/* This will display the file name extracted from the key */}
-              </a>
-              <button onClick={handleFileDeletion}>Remove</button>
-            </div>
+                Choose File
+              </label>
+              <input
+                id="prescriptionFile"
+                type="file"
+                name="PrescriptionFile"
+                onChange={handleChange}
+                accept=".pdf, image/jpeg, image/png"
+                style={{ display: "none" }}
+                required
+              />
+              {inputError.fileUpload && (
+                <p className="text-red-500 text-xs italic">
+                  {inputError.fileUpload}
+                </p>
+              )}
+            </>
           )}
 
           {errorMessage && <div className="text-red-500">{errorMessage}</div>}

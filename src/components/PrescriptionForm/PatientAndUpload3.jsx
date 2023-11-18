@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PrescriptionFormContext } from "./PrescriptionFormContext";
-import { Tooltip } from "react-tooltip";
 import { UsaStates } from "usa-states";
+import { validatePage3Form } from "./form-utils/validations";
 
 const PatientAndUpload3 = () => {
   const { formData, updateFormData, error, loadUserInfo, userInfo } =
@@ -10,6 +10,7 @@ const PatientAndUpload3 = () => {
 
   const navigate = useNavigate();
   const usStates = new UsaStates();
+  const [inputError, setInputError] = useState({});
 
   useEffect(() => {
     // Check if userInfo has been loaded
@@ -23,6 +24,14 @@ const PatientAndUpload3 = () => {
     return <div>Error loading user information: {error.message}</div>;
   }
 
+  // Ensure userInfo fields are set to prevent uncontrolled/controlled warning
+  const initialUserInfo = {
+    AccountHolderFirstName: userInfo?.AccountHolderFirstName || "",
+    AccountHolderLastName: userInfo?.AccountHolderLastName || "",
+    AccountHolderEmail: userInfo?.AccountHolderEmail || "",
+    AccountHolderPhone: userInfo?.AccountHolderPhone || "",
+  };
+
   // If userInfo is null or undefined, you can render a loading state or nothing
   if (!userInfo) {
     return <div>Loading...</div>;
@@ -34,7 +43,12 @@ const PatientAndUpload3 = () => {
   };
 
   const handleNextClick = () => {
-    navigate("/prescription/review-and-submit");
+    const validationErrors = validatePage3Form(formData);
+    if (Object.keys(validationErrors).length === 0) {
+      navigate("/prescription/review-and-submit");
+    } else {
+      setInputError(validationErrors);
+    }
   };
 
   const handleBackClick = () => {
@@ -67,7 +81,7 @@ const PatientAndUpload3 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 bg-gray-200 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              value={userInfo.AccountHolderFirstName}
+              value={initialUserInfo.AccountHolderFirstName}
               readOnly
             />
           </div>
@@ -79,7 +93,7 @@ const PatientAndUpload3 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 bg-gray-200 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              value={userInfo.AccountHolderLastName}
+              value={initialUserInfo.AccountHolderLastName}
               readOnly
             />
           </div>
@@ -91,7 +105,7 @@ const PatientAndUpload3 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 bg-gray-200 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              value={userInfo.AccountHolderPhone}
+              value={initialUserInfo.AccountHolderPhone}
               readOnly
             />
           </div>
@@ -104,7 +118,7 @@ const PatientAndUpload3 = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 bg-gray-200 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="email"
-              value={userInfo.AccountHolderEmail}
+              value={initialUserInfo.AccountHolderEmail}
               readOnly
             />
           </div>
@@ -122,6 +136,11 @@ const PatientAndUpload3 = () => {
               onChange={handleChange}
               required
             />
+            {inputError.AccountHolderAddress && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.AccountHolderAddress}
+              </p>
+            )}
           </div>
 
           {/* State Dropdown */}
@@ -142,6 +161,11 @@ const PatientAndUpload3 = () => {
                 </option>
               ))}
             </select>
+            {inputError.AccountHolderState && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.AccountHolderState}
+              </p>
+            )}
           </div>
 
           {/* City */}
@@ -157,6 +181,11 @@ const PatientAndUpload3 = () => {
               onChange={handleChange}
               required
             />
+            {inputError.AccountHolderCity && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.AccountHolderCity}
+              </p>
+            )}
           </div>
 
           {/* ZIP Code */}
@@ -172,6 +201,11 @@ const PatientAndUpload3 = () => {
               onChange={handleChange}
               required
             />
+            {inputError.AccountHolderZipCode && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.AccountHolderZipCode}
+              </p>
+            )}
           </div>
         </div>
 
