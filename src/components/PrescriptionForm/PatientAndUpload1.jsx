@@ -1,11 +1,13 @@
 // Import useContext from React and our context
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PrescriptionFormContext } from "./PrescriptionFormContext";
+import { validatePage1From } from "./form-utils/validations";
 
 const PatientAndUpload1 = () => {
   const { formData, updateFormData } = useContext(PrescriptionFormContext);
   const navigate = useNavigate();
+  const [inputError, setInputError] = useState({});
 
   const handleChange = (e) => {
     const value = e.target.type === "file" ? e.target.files[0] : e.target.value;
@@ -13,7 +15,12 @@ const PatientAndUpload1 = () => {
   };
 
   const handleNextClick = () => {
-    navigate("/prescription/patient-and-upload-2");
+    const validationErrors = validatePage1From(formData);
+    if (Object.keys(validationErrors).length === 0) {
+      navigate("/prescription/patient-and-upload-2");
+    } else {
+      setInputError(validationErrors);
+    }
   };
 
   return (
@@ -40,7 +47,13 @@ const PatientAndUpload1 = () => {
               name="PatientFirstName"
               value={formData.PatientFirstName || ""}
               onChange={handleChange}
+              required
             />
+            {inputError.PatientFirstName && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.PatientFirstName}
+              </p>
+            )}
           </div>
           <div className="mb-6 md:mb-0">
             <label
@@ -57,7 +70,13 @@ const PatientAndUpload1 = () => {
               name="PatientLastName"
               value={formData.PatientLastName || ""}
               onChange={handleChange}
+              required
             />
+            {inputError.PatientLastName && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.PatientLastName}
+              </p>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -77,6 +96,11 @@ const PatientAndUpload1 = () => {
               value={formData.PatientBirthDate || ""}
               onChange={handleChange}
             />
+            {inputError.PatientBirthDate && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.PatientBirthDate}
+              </p>
+            )}
           </div>
           <div className="mb-6 md:mb-0 md:col-span-1">
             <label
@@ -93,7 +117,13 @@ const PatientAndUpload1 = () => {
               name="PatientAge"
               value={formData.PatientAge || ""}
               onChange={handleChange}
+              required
             />
+            {inputError.PatientAge && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.PatientAge}
+              </p>
+            )}
           </div>
           <div className="flex flex-col md:flex-row justify-center gap-4">
             <div className="mb-6 md:mb-0 md:col-span-1">
@@ -128,6 +158,11 @@ const PatientAndUpload1 = () => {
                   />
                   <span className="ml-2">Female</span>
                 </label>
+                {inputError.PatientSex && (
+                  <p className="text-red-500 text-xs italic">
+                    {inputError.PatientSex}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -149,6 +184,11 @@ const PatientAndUpload1 = () => {
               value={formData.PatientAddress || ""}
               onChange={handleChange}
             />
+            {inputError.PatientAddress && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.PatientAddress}
+              </p>
+            )}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
             <div className="mb-6 lg:mb-0">
@@ -167,6 +207,11 @@ const PatientAndUpload1 = () => {
                 value={formData.PatientCity || ""}
                 onChange={handleChange}
               />
+              {inputError.PatientCity && (
+                <p className="text-red-500 text-xs italic">
+                  {inputError.PatientCity}
+                </p>
+              )}
             </div>
 
             <div className="flex-1 max-w-md">
@@ -185,6 +230,11 @@ const PatientAndUpload1 = () => {
                 value={formData.PatientCountry || ""}
                 onChange={handleChange}
               />
+              {inputError.PatientCountry && (
+                <p className="text-red-500 text-xs italic">
+                  {inputError.PatientCountry}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -209,6 +259,11 @@ const PatientAndUpload1 = () => {
               value={formData.PatientCellular || ""}
               onChange={handleChange}
             />
+            {inputError.PatientCellular && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.PatientCellular}
+              </p>
+            )}
           </div>
         </div>
         <div className="md:self-end">

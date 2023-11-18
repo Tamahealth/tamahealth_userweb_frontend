@@ -1,10 +1,11 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PrescriptionFormContext } from "./PrescriptionFormContext";
+import { validatePage2From } from "./form-utils/validations";
 
 const PatientAndUpload2 = () => {
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [inputError, setInputError] = useState({});
   const {
     formData,
     updateFormData,
@@ -34,7 +35,7 @@ const PatientAndUpload2 = () => {
           setErrorMessage(""); // Clear any previous error messages
           try {
             const uploadResult = await uploadFile(e);
-            console.log("upload result is", uploadResult);
+            // console.log("upload result is", uploadResult);
             const { fileUrl, fileKey } = uploadResult;
             setUploadedFileInfo({ fileUrl, fileKey });
             updateFormData({ ...formData, prescriptionFile: fileUrl }); // Update form data with file URL
@@ -43,11 +44,11 @@ const PatientAndUpload2 = () => {
             setErrorMessage("File upload failed: " + uploadError.message);
           }
         }
-        return; // Exit the function after handling file upload
+        return;
       }
     } else {
       updateFormData({ [name]: e.target.value });
-      setErrorMessage(""); // Clear any error messages for other inputs
+      setErrorMessage("");
     }
   };
 
@@ -59,8 +60,14 @@ const PatientAndUpload2 = () => {
   };
 
   const handleNextClick = () => {
-    navigate("/prescription/patient-and-upload-3");
+    const validationErrors = validatePage2From(formData, uploadedFileInfo);
+    if (Object.keys(validationErrors).length === 0) {
+      navigate("/prescription/patient-and-upload-3");
+    } else {
+      setInputError(validationErrors);
+    }
   };
+
   const handleBackClick = () => {
     navigate("/prescription/patient-and-upload-1");
   };
@@ -90,6 +97,11 @@ const PatientAndUpload2 = () => {
               autoComplete="off"
               required
             />
+            {inputError.PrescriberFullName && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.PrescriberFullName}
+              </p>
+            )}
           </div>
           {/* Occupation */}
           <div className="mb-6 md:mb-0">
@@ -105,6 +117,11 @@ const PatientAndUpload2 = () => {
               autoComplete="off"
               required
             />
+            {inputError.PrescriberOccupation && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.PrescriberOccupation}
+              </p>
+            )}
           </div>
         </div>
 
@@ -124,6 +141,11 @@ const PatientAndUpload2 = () => {
               autoComplete="off"
               required
             />
+            {inputError.PrescriberInstitution && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.PrescriberInstitution}
+              </p>
+            )}
           </div>
 
           {/* Phone Number and Email */}
@@ -142,6 +164,11 @@ const PatientAndUpload2 = () => {
                 pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
                 required
               />
+              {inputError.PrescriberPhone && (
+                <p className="text-red-500 text-xs italic">
+                  {inputError.PrescriberPhone}
+                </p>
+              )}
             </div>
 
             {/* Email */}
@@ -157,11 +184,15 @@ const PatientAndUpload2 = () => {
                 onChange={handleChange}
                 required
               />
+              {inputError.PrescriberEmail && (
+                <p className="text-red-500 text-xs italic">
+                  {inputError.PrescriberEmail}
+                </p>
+              )}
             </div>
           </div>
         </div>
 
-        {/* File Uploader */}
         {/* File Uploader */}
         <div className="mb-6 md:max-w-lg">
           <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -201,7 +232,13 @@ const PatientAndUpload2 = () => {
                 onChange={handleChange}
                 accept=".pdf, image/jpeg, image/png"
                 style={{ display: "none" }}
+                required
               />
+              {inputError.fileUpload && (
+                <p className="text-red-500 text-xs italic">
+                  {inputError.fileUpload}
+                </p>
+              )}
             </>
           )}
 

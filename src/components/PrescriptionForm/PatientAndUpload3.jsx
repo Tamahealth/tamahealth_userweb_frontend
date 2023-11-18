@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PrescriptionFormContext } from "./PrescriptionFormContext";
-import { Tooltip } from "react-tooltip";
 import { UsaStates } from "usa-states";
+import { validatePage3Form } from "./form-utils/validations";
 
 const PatientAndUpload3 = () => {
   const { formData, updateFormData, error, loadUserInfo, userInfo } =
@@ -10,6 +10,7 @@ const PatientAndUpload3 = () => {
 
   const navigate = useNavigate();
   const usStates = new UsaStates();
+  const [inputError, setInputError] = useState({});
 
   useEffect(() => {
     // Check if userInfo has been loaded
@@ -42,7 +43,12 @@ const PatientAndUpload3 = () => {
   };
 
   const handleNextClick = () => {
-    navigate("/prescription/review-and-submit");
+    const validationErrors = validatePage3Form(formData);
+    if (Object.keys(validationErrors).length === 0) {
+      navigate("/prescription/review-and-submit");
+    } else {
+      setInputError(validationErrors);
+    }
   };
 
   const handleBackClick = () => {
@@ -130,6 +136,11 @@ const PatientAndUpload3 = () => {
               onChange={handleChange}
               required
             />
+            {inputError.AccountHolderAddress && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.AccountHolderAddress}
+              </p>
+            )}
           </div>
 
           {/* State Dropdown */}
@@ -150,6 +161,11 @@ const PatientAndUpload3 = () => {
                 </option>
               ))}
             </select>
+            {inputError.AccountHolderState && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.AccountHolderState}
+              </p>
+            )}
           </div>
 
           {/* City */}
@@ -165,6 +181,11 @@ const PatientAndUpload3 = () => {
               onChange={handleChange}
               required
             />
+            {inputError.AccountHolderCity && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.AccountHolderCity}
+              </p>
+            )}
           </div>
 
           {/* ZIP Code */}
@@ -180,6 +201,11 @@ const PatientAndUpload3 = () => {
               onChange={handleChange}
               required
             />
+            {inputError.AccountHolderZipCode && (
+              <p className="text-red-500 text-xs italic">
+                {inputError.AccountHolderZipCode}
+              </p>
+            )}
           </div>
         </div>
 
