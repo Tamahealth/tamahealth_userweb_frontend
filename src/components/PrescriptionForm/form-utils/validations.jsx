@@ -17,12 +17,6 @@ const validatePage1From = (formData) => {
       "Last Name is required and should contain only letters.";
   }
 
-  // Optional: Validate Birthdate format
-
-  // if (!formData.PatientAge || formData.PatientAge <= 0) {
-  //   errors.PatientAge = "Age is required and should be a positive number.";
-  // }
-
   if (!formData.PatientSex) {
     errors.PatientSex = "Sex is required.";
   }

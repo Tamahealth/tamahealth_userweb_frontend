@@ -18,10 +18,9 @@ import Footer from "./components/Footer/Footer";
 import NotFound from "./components/NotFound/NotFound";
 import OTPVerification from "./components/RegistrationForm/OtpVerification";
 import PrescriptionFormContainer from "./components/PrescriptionForm/PrescriptionFormContainer";
-// import NotesAndReview from "./components/PrescriptionForm/NotesAndReview";
-import PatientAndUpload1 from "./components/PrescriptionForm/PatientAndUpload1";
-import PatientAndUpload2 from "./components/PrescriptionForm/PatientAndUpload2";
-import PatientAndUpload3 from "./components/PrescriptionForm/PatientAndUpload3";
+import PaymentPage from "./components/Payments/PrescriptionPayment";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -29,6 +28,9 @@ export default function App() {
   const [logginError, setLoginError] = useState("");
   // State for userData
   const [userData, setUserData] = useState({});
+  const stripePromise = loadStripe(
+    "import.meta.env.VITE_APP_STRIPE_PUBLIC_KEY"
+  );
 
   // Function to update userData state
   const handleUserDataUpdate = (newUserData) => {
@@ -101,6 +103,16 @@ export default function App() {
                     setUserData={handleUserDataUpdate}
                   />
                 )
+              }
+            />
+            <Route
+              path="/prescription/payment"
+              element={
+                <PrivateRoute>
+                  <Elements stripe={stripePromise}>
+                    <PaymentPage />
+                  </Elements>
+                </PrivateRoute>
               }
             />
             <Route
