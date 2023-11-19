@@ -8,30 +8,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { UsaStates } from "usa-states";
-
-function validatePaymentForm(name, zipCode) {
-  let errors = {};
-
-  if (!name.trim()) {
-    errors.name = "Name on card is required.";
-  } else {
-    // Split the name by spaces to check for first and last name
-    const nameParts = name.trim().split(" ");
-    // Check for at least two name parts and no digits in the name
-    if (nameParts.length < 2 || /\d/.test(name)) {
-      errors.name =
-        "Please enter your full name (first and last name) without numbers or special characters.";
-    }
-  }
-
-  if (!zipCode.trim()) {
-    errors.zipCode = "ZIP code is required.";
-  } else if (!/^\d{5}(-\d{4})?$/.test(zipCode)) {
-    errors.zipCode = "Invalid ZIP code. Please enter a valid ZIP code.";
-  }
-
-  return errors;
-}
+import { PaymentInputValidation } from "./PaymentInputValidation";
 
 const PaymentPage = () => {
   const stripe = useStripe();
@@ -39,26 +16,108 @@ const PaymentPage = () => {
   const [isChecked, setIsChecked] = useState(false);
   const [amount, setAmount] = useState(0);
   const usStates = new UsaStates();
-  const [name, setName] = useState("");
+  const [CardHolderName, setCardHolderName] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [userState, setUserState] = useState("");
   const [inputErrors, setInputErrors] = useState({});
+  const [isTouched, setIsTouched] = useState(false);
+
+  const [cardDetailsErrors, setCardDetailsErrors] = useState({
+    cardNumber: "",
+    cardExpiry: "",
+    cardCvc: "",
+  });
 
   const handleCheckboxChange = (e) => {
-    e.preventDefault();
-    const errors = validatePaymentForm(name, zipCode, userState);
-    setInputErrors(errors);
-    setIsChecked(e.target.checked);
+    setIsTouched(true);
+
+    // Check for errors in card details
+    const hasCardErrors = Object.values(cardDetailsErrors).some(
+      (error) => error
+    );
+    const hasOtherErrors = Object.values(inputErrors).some((error) => error);
+
+    // Perform the rest of the validation
+    const validationErrors = PaymentInputValidation(
+      CardHolderName,
+      zipCode,
+      userState
+    );
+
+    setInputErrors(validationErrors);
+
+    if (!hasCardErrors && !hasOtherErrors) {
+      setIsChecked(e.target.checked);
+    } else {
+      setIsChecked(false);
+    }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
+  const updateFormFieldsDisabling = (disable) => {
+    if (elements) {
+      elements.getElement(CardNumberElement).update({ disabled: disable });
+      elements.getElement(CardExpiryElement).update({ disabled: disable });
+      elements.getElement(CardCvcElement).update({ disabled: disable });
     }
 
-    // Implement payment logic here
+    // Additional code to disable other input fields if required
+  };
+
+  const handleCardChange = (event) => {
+    setCardDetailsErrors({
+      ...cardDetailsErrors,
+      [event.elementType]: event.error ? event.error.message : "",
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "CardHolderName") {
+      setCardHolderName(value);
+    } else if (name === "postalCode") {
+      setZipCode(value);
+    } else if (name === "state") {
+      setUserState(value);
+    }
+
+    // Call validation function here if you want immediate feedback on errors
+    const validationErrors = PaymentInputValidation(
+      name === "CardHolderName" ? value : CardHolderName,
+      name === "postalCode" ? value : zipCode,
+      name === "state" ? value : userState
+    );
+    setInputErrors(validationErrors);
+  };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsTouched(true);
+
+    // Call Stripe's validation for card elements here if needed
+
+    const cardErrors = {
+      cardNumber: cardDetailsErrors.cardNumber,
+      cardExpiry: cardDetailsErrors.cardExpiry,
+      cardCvc: cardDetailsErrors.cardCvc,
+    };
+
+    const validationErrors = PaymentInputValidation(
+      CardHolderName,
+      zipCode,
+      userState,
+      cardErrors
+    );
+
+    setInputErrors(validationErrors);
+
+    if (
+      Object.keys(validationErrors).length === 0 &&
+      isChecked &&
+      !Object.values(cardErrors).some((error) => error)
+    ) {
+      // No errors and the checkbox is checked, proceed with payment logic
+      // TODO: Add payment logic here
+    }
   };
 
   return (
@@ -92,14 +151,18 @@ const PaymentPage = () => {
                 <input
                   type="text"
                   id="name"
-                  name="name"
+                  name="CardHolderName"
                   placeholder="John Doe"
+                  value={CardHolderName}
+                  onChange={handleInputChange}
+                  disabled={isChecked}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
                 />
-                {inputErrors.name && (
+
+                {inputErrors.cardHolderName && (
                   <p className="text-red-500 text-xs italic">
-                    {inputErrors.name}
+                    {inputErrors.cardHolderName}
                   </p>
                 )}
               </div>
@@ -108,7 +171,15 @@ const PaymentPage = () => {
                 <label className="block mb-2 text-sm text-gray-600">
                   Card Number
                 </label>
-                <CardNumberElement className="p-3 border border-gray-300 rounded-md" />
+                <CardNumberElement
+                  onChange={handleCardChange}
+                  className="p-3 border border-gray-300 rounded-md"
+                />
+                {cardDetailsErrors.cardNumber && (
+                  <p className="text-red-500 text-xs italic">
+                    {cardDetailsErrors.cardNumber}
+                  </p>
+                )}
               </div>
 
               <div className="flex mb-6 -mx-2">
@@ -116,13 +187,29 @@ const PaymentPage = () => {
                   <label className="block mb-2 text-sm text-gray-600">
                     Expiry Date
                   </label>
-                  <CardExpiryElement className="p-3 border border-gray-300 rounded-md" />
+                  <CardExpiryElement
+                    onChange={handleCardChange}
+                    className="p-3 border border-gray-300 rounded-md"
+                  />
+                  {cardDetailsErrors.cardExpiry && (
+                    <p className="text-red-500 text-xs italic">
+                      {cardDetailsErrors.cardExpiry}
+                    </p>
+                  )}
                 </div>
                 <div className="w-1/2 px-2">
                   <label className="block mb-2 text-sm text-gray-600">
                     CVC
                   </label>
-                  <CardCvcElement className="p-3 border border-gray-300 rounded-md" />
+                  <CardCvcElement
+                    onChange={handleCardChange}
+                    className="p-3 border border-gray-300 rounded-md"
+                  />
+                  {cardDetailsErrors.cardCvc && (
+                    <p className="text-red-500 text-xs italic">
+                      {cardDetailsErrors.cardCvc}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -138,6 +225,9 @@ const PaymentPage = () => {
                     type="text"
                     id="postal-code"
                     name="postalCode"
+                    value={zipCode}
+                    onChange={handleInputChange}
+                    disabled={isChecked}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     required
                   />
@@ -159,7 +249,10 @@ const PaymentPage = () => {
                     id="state"
                     name="state"
                     defaultValue=""
+                    value={userState}
+                    disabled={isChecked}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    onChange={handleInputChange}
                     required
                   >
                     <option value="" disabled>
@@ -174,19 +267,23 @@ const PaymentPage = () => {
                       </option>
                     ))}
                   </select>
+                  {inputErrors.userState && (
+                    <p className="text-red-500 text-xs italic">
+                      {inputErrors.userState}
+                    </p>
+                  )}
                 </div>
-                {inputErrors.userState && (
-                  <p className="error-message">{inputErrors.userState}</p>
-                )}
               </div>
 
               <div className="flex items-center mb-6">
                 <input
                   type="checkbox"
                   id="terms"
+                  checked={isChecked}
                   onChange={handleCheckboxChange}
                   className="form-checkbox"
                 />
+
                 <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
                   I agree to the terms and conditions
                 </label>
