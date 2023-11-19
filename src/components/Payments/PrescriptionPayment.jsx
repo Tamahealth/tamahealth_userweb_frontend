@@ -14,13 +14,17 @@ const PaymentPage = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [isChecked, setIsChecked] = useState(false);
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState(50);
   const usStates = new UsaStates();
   const [CardHolderName, setCardHolderName] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [userState, setUserState] = useState("");
   const [inputErrors, setInputErrors] = useState({});
   const [isTouched, setIsTouched] = useState(false);
+  // States to track if user interacted with card fields
+  const [cardNumberTouched, setCardNumberTouched] = useState(false);
+  const [cardExpiryTouched, setCardExpiryTouched] = useState(false);
+  const [cardCvcTouched, setCardCvcTouched] = useState(false);
 
   const [cardDetailsErrors, setCardDetailsErrors] = useState({
     cardNumber: "",
@@ -31,12 +35,6 @@ const PaymentPage = () => {
   const handleCheckboxChange = (e) => {
     setIsTouched(true);
 
-    // Check for errors in card details
-    const hasCardErrors = Object.values(cardDetailsErrors).some(
-      (error) => error
-    );
-    const hasOtherErrors = Object.values(inputErrors).some((error) => error);
-
     // Perform the rest of the validation
     const validationErrors = PaymentInputValidation(
       CardHolderName,
@@ -44,10 +42,20 @@ const PaymentPage = () => {
       userState
     );
 
+    // Check for errors in card details
+    // Check if all card fields have been interacted with
+    const allCardFieldsTouched =
+      cardNumberTouched && cardExpiryTouched && cardCvcTouched;
+    const hasCardErrors = Object.values(cardDetailsErrors).some(
+      (error) => error
+    );
+    const hasOtherErrors = Object.values(inputErrors).some((error) => error);
+
     setInputErrors(validationErrors);
 
-    if (!hasCardErrors && !hasOtherErrors) {
+    if (allCardFieldsTouched && !hasCardErrors && !hasOtherErrors) {
       setIsChecked(e.target.checked);
+      updateFormFieldsDisabling(e.target.checked);
     } else {
       setIsChecked(false);
     }
@@ -55,18 +63,49 @@ const PaymentPage = () => {
 
   const updateFormFieldsDisabling = (disable) => {
     if (elements) {
-      elements.getElement(CardNumberElement).update({ disabled: disable });
-      elements.getElement(CardExpiryElement).update({ disabled: disable });
-      elements.getElement(CardCvcElement).update({ disabled: disable });
+      elements.getElement(CardNumberElement)?.update({ disabled: disable });
+      elements.getElement(CardExpiryElement)?.update({ disabled: disable });
+      elements.getElement(CardCvcElement)?.update({ disabled: disable });
     }
-
-    // Additional code to disable other input fields if required
   };
 
   const handleCardChange = (event) => {
+    // Update the touched state immediately when the user interacts with the card fields
+    if (event.elementType === "cardNumber") {
+      setCardNumberTouched(true);
+    } else if (event.elementType === "cardExpiry") {
+      setCardExpiryTouched(true);
+    } else if (event.elementType === "cardCvc") {
+      setCardCvcTouched(true);
+    }
+
+    // Set error message based on Stripe's event.error and the touched state
+    let errorMessage = "";
+    if (!event.complete && event.error) {
+      errorMessage = event.error.message;
+    } else if (
+      !event.complete &&
+      event.elementType === "cardNumber" &&
+      cardNumberTouched
+    ) {
+      errorMessage = "Card number is required.";
+    } else if (
+      !event.complete &&
+      event.elementType === "cardExpiry" &&
+      cardExpiryTouched
+    ) {
+      errorMessage = "Expiry date is required.";
+    } else if (
+      !event.complete &&
+      event.elementType === "cardCvc" &&
+      cardCvcTouched
+    ) {
+      errorMessage = "CVC is required.";
+    }
+
     setCardDetailsErrors({
       ...cardDetailsErrors,
-      [event.elementType]: event.error ? event.error.message : "",
+      [event.elementType]: errorMessage,
     });
   };
 
@@ -175,6 +214,11 @@ const PaymentPage = () => {
                   onChange={handleCardChange}
                   className="p-3 border border-gray-300 rounded-md"
                 />
+                {/* {cardNumberTouched && !cardDetailsErrors.cardNumber && (
+                  <p className="text-red-500 text-xs italic">
+                    Card number is required.
+                  </p>
+                )} */}
                 {cardDetailsErrors.cardNumber && (
                   <p className="text-red-500 text-xs italic">
                     {cardDetailsErrors.cardNumber}
@@ -191,6 +235,7 @@ const PaymentPage = () => {
                     onChange={handleCardChange}
                     className="p-3 border border-gray-300 rounded-md"
                   />
+
                   {cardDetailsErrors.cardExpiry && (
                     <p className="text-red-500 text-xs italic">
                       {cardDetailsErrors.cardExpiry}
@@ -205,6 +250,7 @@ const PaymentPage = () => {
                     onChange={handleCardChange}
                     className="p-3 border border-gray-300 rounded-md"
                   />
+
                   {cardDetailsErrors.cardCvc && (
                     <p className="text-red-500 text-xs italic">
                       {cardDetailsErrors.cardCvc}
@@ -248,7 +294,7 @@ const PaymentPage = () => {
                   <select
                     id="state"
                     name="state"
-                    defaultValue=""
+                    // defaultValue=""
                     value={userState}
                     disabled={isChecked}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -296,7 +342,7 @@ const PaymentPage = () => {
                   !isChecked ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                Pay
+                Pay ${amount}
               </button>
             </form>
           </div>
