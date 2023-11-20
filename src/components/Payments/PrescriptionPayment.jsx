@@ -9,6 +9,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { UsaStates } from "usa-states";
 import { PaymentInputValidation } from "./PaymentInputValidation";
+import { PaymentHandler } from "./PaymentHandler";
 
 const PaymentPage = () => {
   const stripe = useStripe();
@@ -25,6 +26,7 @@ const PaymentPage = () => {
   const [cardNumberTouched, setCardNumberTouched] = useState(false);
   const [cardExpiryTouched, setCardExpiryTouched] = useState(false);
   const [cardCvcTouched, setCardCvcTouched] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // For spinner
 
   const [cardDetailsErrors, setCardDetailsErrors] = useState({
     cardNumber: "",
@@ -131,6 +133,7 @@ const PaymentPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsTouched(true);
+    setIsLoading(true);
 
     // Call Stripe's validation for card elements here if needed
 
@@ -157,6 +160,7 @@ const PaymentPage = () => {
       // No errors and the checkbox is checked, proceed with payment logic
       // TODO: Add payment logic here
     }
+    setIsLoading(false);
   };
 
   return (
@@ -169,7 +173,7 @@ const PaymentPage = () => {
             {/* Replace this section with your service description and image */}
           </div>
         </div>
-        <div className="w-full lg:w-1/2 px-4">
+        <div className="w-full lg:w-1/2 px-4 lg:max-w-lg mx-auto">
           <div className="bg-white p-5 rounded-md shadow-sm">
             <div className="text-center mb-10">
               <h1 className="my-3 text-3xl font-semibold text-gray-700">
@@ -214,11 +218,7 @@ const PaymentPage = () => {
                   onChange={handleCardChange}
                   className="p-3 border border-gray-300 rounded-md"
                 />
-                {/* {cardNumberTouched && !cardDetailsErrors.cardNumber && (
-                  <p className="text-red-500 text-xs italic">
-                    Card number is required.
-                  </p>
-                )} */}
+
                 {cardDetailsErrors.cardNumber && (
                   <p className="text-red-500 text-xs italic">
                     {cardDetailsErrors.cardNumber}
@@ -334,15 +334,15 @@ const PaymentPage = () => {
                   I agree to the terms and conditions
                 </label>
               </div>
-
+              {isLoading && <div className="spinner">Loading...</div>}
               <button
                 type="submit"
-                disabled={!isChecked}
-                className={`w-full px-3 py-4 text-white bg-blue-500 rounded-md focus:outline-none ${
-                  !isChecked ? "opacity-50 cursor-not-allowed" : ""
+                disabled={!isChecked || isLoading}
+                className={`w-full px-3 py-4 text-white bg-blue-500 hover:bg-blue-900 rounded-md focus:outline-none ${
+                  !isChecked || isLoading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                Pay ${amount}
+                {isLoading ? "Processing..." : `Pay $${amount}`}
               </button>
             </form>
           </div>

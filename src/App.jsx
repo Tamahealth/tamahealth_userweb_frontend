@@ -28,9 +28,7 @@ export default function App() {
   const [logginError, setLoginError] = useState("");
   // State for userData
   const [userData, setUserData] = useState({});
-  const stripePromise = loadStripe(
-    "import.meta.env.VITE_APP_STRIPE_PUBLIC_KEY"
-  );
+  const stripePromise = loadStripe(import.meta.env.VITE_APP_STRIPE_PUBLIC_KEY);
 
   // Function to update userData state
   const handleUserDataUpdate = (newUserData) => {
