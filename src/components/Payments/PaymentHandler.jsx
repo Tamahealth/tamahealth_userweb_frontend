@@ -70,12 +70,12 @@ const PaymentHandler = {
       // Confirm the card payment
       const paymentResult = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
-          card: cardElement,
+          card: cardNumberElement,
           billing_details: {
-            name: cardHolderDetails.cardHolderName,
+            name: cardHolderName,
             address: {
-              postal_code: cardHolderDetails.zipCode,
-              state: cardHolderDetails.userState,
+              postal_code: zipCode,
+              state: userState,
             },
           },
         },

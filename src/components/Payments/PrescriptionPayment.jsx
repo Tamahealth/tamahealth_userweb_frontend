@@ -130,13 +130,15 @@ const PaymentPage = () => {
     );
     setInputErrors(validationErrors);
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsTouched(true);
     setIsLoading(true);
 
-    // Call Stripe's validation for card elements here if needed
+    const cardNumberElement = elements.getElement(CardNumberElement);
 
+    // Validate the card details and other input fields
     const cardErrors = {
       cardNumber: cardDetailsErrors.cardNumber,
       cardExpiry: cardDetailsErrors.cardExpiry,
@@ -157,9 +159,39 @@ const PaymentPage = () => {
       isChecked &&
       !Object.values(cardErrors).some((error) => error)
     ) {
-      // No errors and the checkbox is checked, proceed with payment logic
-      // TODO: Add payment logic here
+      // If no errors, proceed with the payment
+      try {
+        const amountInCents = amount * 100; // Convert amount to cents for Stripe
+        const serviceId = "your-service-id"; // Replace with actual service ID
+        const userId = "your-user-id"; // Replace with actual user ID
+
+        // Call the payment handler function
+        const paymentResult = await PaymentHandler.handlePaymentSubmission(
+          amountInCents,
+          serviceId,
+          userId,
+          cardNumberElement,
+          CardHolderName,
+          zipCode
+        );
+
+        // Check the payment status and handle accordingly
+        if (paymentResult.error) {
+          // Handle payment errors (e.g., card declined)
+          console.error(paymentResult.error.message);
+        } else if (paymentResult.paymentIntent.status === "succeeded") {
+          // Handle successful payment
+          console.log("Payment succeeded!");
+        } else {
+          // Handle other payment statuses as needed
+          console.log(paymentResult.paymentIntent.status);
+        }
+      } catch (error) {
+        // Handle any other errors
+        console.error("Payment failed:", error);
+      }
     }
+
     setIsLoading(false);
   };
 
