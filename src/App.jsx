@@ -104,7 +104,7 @@ export default function App() {
               }
             />
             <Route
-              path="/prescription/payment"
+              path="/prescription/payment/:serviceId"
               element={
                 <PrivateRoute>
                   <Elements stripe={stripePromise}>
@@ -113,6 +113,16 @@ export default function App() {
                 </PrivateRoute>
               }
             />
+            {/* <Route
+              path="/tenia-treatment/payment"
+              element={
+                <PrivateRoute>
+                  <Elements stripe={stripePromise}>
+                    <PaymentPage />
+                  </Elements>
+                </PrivateRoute>
+              }
+            /> */}
             <Route
               path="/home"
               element={

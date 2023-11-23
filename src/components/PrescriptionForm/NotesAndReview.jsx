@@ -141,7 +141,7 @@ const NotesAndReview = () => {
           <button
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
             onClick={() => {
-              navigate("/prescription/payment");
+              navigate("/prescription/payment/1");
             }}
           >
             Confirm and Continue
