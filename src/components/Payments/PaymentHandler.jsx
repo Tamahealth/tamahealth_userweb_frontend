@@ -1,9 +1,33 @@
-BASE_URL = import.meta.env.VITE_APP_BASE_URL;
+const BASE_URL = import.meta.env.VITE_APP_BASE_URL;
 import { loadStripe } from "@stripe/stripe-js";
+const stripePromise = loadStripe(import.meta.env.VITE_APP_STRIPE_PUBLIC_KEY);
 
 const PaymentHandler = {
+  // Function to fetch service type and details
+  fetchServiceDetails: async (serviceId) => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/payments/services/${serviceId}`
+      );
+      const serviceData = await response.json();
+      // console.log("Service Data is ", serviceData);
+      return serviceData;
+    } catch (error) {
+      console.error("Error fetching service details:", error);
+      throw error;
+    }
+  },
+  // Function to get the current user's ID from local storage
+  getCurrentUserId: () => {
+    const user = JSON.parse(localStorage.getItem("userId"));
+    console.log("User ID is ", user?.userId);
+    return user?.userId;
+  },
+
   // Function to create a payment intent and retrieve the client secret
-  createPaymentIntent: async (amount, serviceId, userId) => {
+  createPaymentIntent: async (amount, serviceId) => {
+    const userId = localStorage.getItem("userId");
+    console.log("User ID in create payment intent is ", userId);
     try {
       const response = await fetch(
         `${BASE_URL}/api/payments/create-payment-intent`,
@@ -11,6 +35,7 @@ const PaymentHandler = {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           body: JSON.stringify({
             amount,
@@ -46,41 +71,42 @@ const PaymentHandler = {
       throw error;
     }
   },
+
   // New function to handle payment submission
-  handlePaymentSubmission: async (
-    amount,
-    serviceId,
-    userId,
-    cardElement,
-    cardHolderDetails
-  ) => {
+  handlePaymentSubmission: async (serviceId, userId, cardDetails, elements) => {
+    const stripe = await stripePromise;
+    // console.log("Stripe instance:", stripe);
     try {
-      // Load Stripe
-      const stripe = await loadStripe(
-        import.meta.env.VITE_APP_STRIPE_PUBLIC_KEY
+      // Retrieve service details to get the amount
+      const response = await fetch(
+        `${BASE_URL}/api/payments/services/${serviceId}`
       );
+      const serviceData = await response.json();
+      const amount = serviceData.price;
 
       // Create a payment intent and retrieve the client secret
       const clientSecret = await PaymentHandler.createPaymentIntent(
         amount,
         serviceId,
-        userId
+        localStorage.getItem("userId")
       );
+      console.log("Client Secret: ", clientSecret); // Log to verify client secret
 
+      console.log("Card Number Element: ", cardDetails.cardNumberElement);
       // Confirm the card payment
       const paymentResult = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
-          card: cardNumberElement,
+          card: cardDetails.cardNumberElement,
           billing_details: {
-            name: cardHolderName,
+            name: cardDetails.cardHolderName,
             address: {
-              postal_code: zipCode,
-              state: userState,
+              postal_code: cardDetails.zipCode,
+              state: cardDetails.userState,
             },
           },
         },
       });
-
+      console.log("Payment Result:", paymentResult);
       if (paymentResult.error) {
         // Handle payment errors here
         throw new Error(paymentResult.error.message);
@@ -93,7 +119,6 @@ const PaymentHandler = {
         // Payment succeeded, update your backend as needed
         return { success: true, paymentIntent: paymentResult.paymentIntent };
       }
-
       return { success: false, error: "Payment failed" };
     } catch (error) {
       console.error("Payment failed", error);

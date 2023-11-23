@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "@stripe/stripe-js";
 import {
   CardNumberElement,
@@ -9,19 +9,22 @@ import {
 } from "@stripe/react-stripe-js";
 import { UsaStates } from "usa-states";
 import { PaymentInputValidation } from "./PaymentInputValidation";
-import { PaymentHandler } from "./PaymentHandler";
+import PaymentHandler from "./PaymentHandler";
+import { useParams } from "react-router-dom";
 
 const PaymentPage = () => {
   const stripe = useStripe();
   const elements = useElements();
+  const { serviceId } = useParams();
+
   const [isChecked, setIsChecked] = useState(false);
-  const [amount, setAmount] = useState(50);
-  const usStates = new UsaStates();
-  const [CardHolderName, setCardHolderName] = useState("");
-  const [zipCode, setZipCode] = useState("");
-  const [userState, setUserState] = useState("");
-  const [inputErrors, setInputErrors] = useState({});
-  const [isTouched, setIsTouched] = useState(false);
+  const [amount, setAmount] = useState(0);
+  const usStates = new UsaStates(); // For US states
+  const [CardHolderName, setCardHolderName] = useState(""); // Card holder name
+  const [zipCode, setZipCode] = useState(""); // US zip code
+  const [userState, setUserState] = useState(""); // US state
+  const [inputErrors, setInputErrors] = useState({}); // For validation
+  const [isTouched, setIsTouched] = useState(false); // For validation
   // States to track if user interacted with card fields
   const [cardNumberTouched, setCardNumberTouched] = useState(false);
   const [cardExpiryTouched, setCardExpiryTouched] = useState(false);
@@ -33,6 +36,20 @@ const PaymentPage = () => {
     cardExpiry: "",
     cardCvc: "",
   });
+
+  useEffect(() => {
+    if (serviceId) {
+      PaymentHandler.fetchServiceDetails(serviceId)
+        .then((serviceDetails) => {
+          setAmount(serviceDetails.price);
+        })
+        .catch((error) => {
+          console.error("Error fetching service details:", error);
+        });
+    } else {
+      console.log("Service ID is undefined");
+    }
+  }, [serviceId]);
 
   const handleCheckboxChange = (e) => {
     setIsTouched(true);
@@ -133,63 +150,57 @@ const PaymentPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log("Form submission started");
     setIsTouched(true);
     setIsLoading(true);
+    const userId = localStorage.getItem("userId");
 
-    const cardNumberElement = elements.getElement(CardNumberElement);
-
-    // Validate the card details and other input fields
-    const cardErrors = {
-      cardNumber: cardDetailsErrors.cardNumber,
-      cardExpiry: cardDetailsErrors.cardExpiry,
-      cardCvc: cardDetailsErrors.cardCvc,
-    };
+    // console.log("Service ID:", serviceId, "User ID:", userId);
 
     const validationErrors = PaymentInputValidation(
       CardHolderName,
       zipCode,
-      userState,
-      cardErrors
+      userState
     );
 
     setInputErrors(validationErrors);
 
-    if (
-      Object.keys(validationErrors).length === 0 &&
-      isChecked &&
-      !Object.values(cardErrors).some((error) => error)
-    ) {
-      // If no errors, proceed with the payment
-      try {
-        const amountInCents = amount * 100; // Convert amount to cents for Stripe
-        const serviceId = "your-service-id"; // Replace with actual service ID
-        const userId = "your-user-id"; // Replace with actual user ID
+    console.log("Validation Errors:", validationErrors);
+    console.log("Is Checkbox Checked:", isChecked);
 
-        // Call the payment handler function
-        const paymentResult = await PaymentHandler.handlePaymentSubmission(
-          amountInCents,
+    if (Object.keys(validationErrors).length === 0 && isChecked) {
+      console.log("All conditions met. Proceeding to payment submission");
+
+      try {
+        const cardNumberElement = elements.getElement(CardNumberElement);
+        const cardExpiryElement = elements.getElement(CardExpiryElement);
+        const cardCvcElement = elements.getElement(CardCvcElement);
+        const result = await PaymentHandler.handlePaymentSubmission(
           serviceId,
           userId,
-          cardNumberElement,
-          CardHolderName,
-          zipCode
+          {
+            cardNumberElement,
+            cardExpiryElement,
+            cardCvcElement,
+            cardHolderName: CardHolderName,
+            zipCode,
+            userState,
+          },
+          elements
         );
 
-        // Check the payment status and handle accordingly
-        if (paymentResult.error) {
-          // Handle payment errors (e.g., card declined)
-          console.error(paymentResult.error.message);
-        } else if (paymentResult.paymentIntent.status === "succeeded") {
-          // Handle successful payment
+        console.log("Payment result:", result);
+
+        if (result.success) {
           console.log("Payment succeeded!");
         } else {
-          // Handle other payment statuses as needed
-          console.log(paymentResult.paymentIntent.status);
+          console.error("Payment failed:", result.error);
         }
       } catch (error) {
-        // Handle any other errors
-        console.error("Payment failed:", error);
+        console.error("Payment submission error:", error);
       }
+    } else {
+      console.log("Conditions not met for payment submission");
     }
 
     setIsLoading(false);

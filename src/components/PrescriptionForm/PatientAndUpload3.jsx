@@ -155,6 +155,9 @@ const PatientAndUpload3 = () => {
               onChange={handleChange}
               required
             >
+              <option disabled={true} value="">
+                Select a state
+              </option>
               {usStates.states.map((state) => (
                 <option key={state.abbreviation} value={state.abbreviation}>
                   {state.name}
