@@ -11,6 +11,7 @@ import { UsaStates } from "usa-states";
 import { PaymentInputValidation } from "./PaymentInputValidation";
 import PaymentHandler from "./PaymentHandler";
 import { useParams } from "react-router-dom";
+import { getPaymentErrorMessage } from "./paymentErrorHandling";
 
 const PaymentPage = () => {
   const stripe = useStripe();
@@ -30,7 +31,7 @@ const PaymentPage = () => {
   const [cardExpiryTouched, setCardExpiryTouched] = useState(false);
   const [cardCvcTouched, setCardCvcTouched] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // For spinner
-
+  const [paymentError, setPaymentError] = useState(""); // For error message
   const [cardDetailsErrors, setCardDetailsErrors] = useState({
     cardNumber: "",
     cardExpiry: "",
@@ -41,7 +42,7 @@ const PaymentPage = () => {
     if (serviceId) {
       PaymentHandler.fetchServiceDetails(serviceId)
         .then((serviceDetails) => {
-          setAmount(serviceDetails.price);
+          setAmount(serviceDetails.price * 100);
         })
         .catch((error) => {
           console.error("Error fetching service details:", error);
@@ -153,6 +154,7 @@ const PaymentPage = () => {
     console.log("Form submission started");
     setIsTouched(true);
     setIsLoading(true);
+    setPaymentError("");
     const userId = localStorage.getItem("userId");
 
     // console.log("Service ID:", serviceId, "User ID:", userId);
@@ -165,8 +167,8 @@ const PaymentPage = () => {
 
     setInputErrors(validationErrors);
 
-    console.log("Validation Errors:", validationErrors);
-    console.log("Is Checkbox Checked:", isChecked);
+    // console.log("Validation Errors:", validationErrors);
+    // console.log("Is Checkbox Checked:", isChecked);
 
     if (Object.keys(validationErrors).length === 0 && isChecked) {
       console.log("All conditions met. Proceeding to payment submission");
@@ -175,6 +177,8 @@ const PaymentPage = () => {
         const cardNumberElement = elements.getElement(CardNumberElement);
         const cardExpiryElement = elements.getElement(CardExpiryElement);
         const cardCvcElement = elements.getElement(CardCvcElement);
+
+        // Use the stripe instance from useStripe hook
         const result = await PaymentHandler.handlePaymentSubmission(
           serviceId,
           userId,
@@ -186,7 +190,7 @@ const PaymentPage = () => {
             zipCode,
             userState,
           },
-          elements
+          stripe
         );
 
         console.log("Payment result:", result);
@@ -198,6 +202,9 @@ const PaymentPage = () => {
         }
       } catch (error) {
         console.error("Payment submission error:", error);
+        const errorMessage = getPaymentErrorMessage(error.error);
+        console.log("Error Message to be set:", errorMessage);
+        setPaymentError(errorMessage);
       }
     } else {
       console.log("Conditions not met for payment submission");
@@ -385,9 +392,15 @@ const PaymentPage = () => {
                   !isChecked || isLoading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                {isLoading ? "Processing..." : `Pay $${amount}`}
+                {isLoading ? "Processing..." : `Pay $${amount / 100}`}
               </button>
             </form>
+            {paymentError && (
+              <>
+                <p className="text-red-500 text-xs italic">{paymentError}</p>
+                {console.log("Rendering error message:", paymentError)}
+              </>
+            )}
           </div>
         </div>
       </div>
