@@ -18,6 +18,7 @@ import Footer from "./components/Footer/Footer";
 import NotFound from "./components/NotFound/NotFound";
 import OTPVerification from "./components/RegistrationForm/OtpVerification";
 import PrescriptionFormContainer from "./components/PrescriptionForm/PrescriptionFormContainer";
+import SoliumFormContainer from "./components/soliumTreatment/SoliumFormContainer";
 import PaymentPage from "./components/Payments/PrescriptionPayment";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -136,6 +137,10 @@ export default function App() {
             <Route
               path="/prescription/*"
               element={<PrescriptionFormContainer />}
+            />
+            <Route
+              path="/solium/*"
+              element={<SoliumFormContainer />}
             />
 
             <Route path="*" element={<NotFound />} />
