@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function AuthenticatedHero({ user }) {
+  const navigate = useNavigate();
   return (
     <div
       className="relative bg-cover bg-center h-[60vh] md:h-[600px] flex flex-col justify-start md:justify-center items-center text-white px-5 py-5 md:py-20"
@@ -23,12 +25,7 @@ export default function AuthenticatedHero({ user }) {
 
       <div className="mt-6 w-full grid grid-cols-1 md:grid-cols-2 gap-4 md:max-w-3xl mx-auto">
         {/* Service One: Submit Prescription */}
-        <button
-          className="border border-white text-white px-6 py-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 z-10 hover:bg-white hover:text-blue-900"
-          onClick={() => {
-            window.location.href = "/prescription";
-          }}
-        >
+        <button onClick={() => navigate("/prescription/patient-and-upload-1")}>
           Submit Your Prescription
         </button>
 
@@ -36,7 +33,7 @@ export default function AuthenticatedHero({ user }) {
         <button
           className="border border-white text-white px-6 py-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 z-10 hover:bg-white hover:text-blue-900"
           onClick={() => {
-            window.location.href = "/solium";
+            navigate("solium/symptoms-form-1");
           }}
         >
           Solium Treatment

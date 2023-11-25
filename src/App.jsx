@@ -22,6 +22,11 @@ import SoliumFormContainer from "./components/soliumTreatment/SoliumFormContaine
 import PaymentPage from "./components/Payments/PrescriptionPayment";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import PatientAndUpload1 from "./components/PrescriptionForm/PatientAndUpload1";
+import PatientAndUpload2 from "./components/PrescriptionForm/PatientAndUpload2";
+import PatientAndUpload3 from "./components/PrescriptionForm/PatientAndUpload3";
+import NotesAndReview from "./components/PrescriptionForm/NotesAndReview";
+import { PrescriptionFormProvider } from "./components/PrescriptionForm/PrescriptionFormContext";
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -62,59 +67,60 @@ export default function App() {
         <div className="content-wrapper">
           {" "}
           {/* Use the content-wrapper class you've defined */}
-          <Routes>
-            <Route
-              path="/"
-              element={
-                loggedIn ? (
-                  <AuthenticatedLandingPage user={user} userData={userData} />
-                ) : (
-                  <LandingPage />
-                )
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                loggedIn ? (
-                  <Navigate to="/home" />
-                ) : (
-                  <RegistrationForm
-                    setUser={setUser}
-                    user={user}
-                    setLoginError={setLoginError}
-                    setLoggedIn={setLoggedIn}
-                  />
-                )
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                loggedIn ? (
-                  <Navigate to="/" />
-                ) : (
-                  <LoginForm
-                    setUser={setUser}
-                    user={user}
-                    setLoginError={setLoginError}
-                    setLoggedIn={setLoggedIn}
-                    setUserData={handleUserDataUpdate}
-                  />
-                )
-              }
-            />
-            <Route
-              path="/prescription/payment/:serviceId"
-              element={
-                <PrivateRoute>
-                  <Elements stripe={stripePromise}>
-                    <PaymentPage />
-                  </Elements>
-                </PrivateRoute>
-              }
-            />
-            {/* <Route
+          <PrescriptionFormProvider>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  loggedIn ? (
+                    <AuthenticatedLandingPage user={user} userData={userData} />
+                  ) : (
+                    <LandingPage />
+                  )
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  loggedIn ? (
+                    <Navigate to="/home" />
+                  ) : (
+                    <RegistrationForm
+                      setUser={setUser}
+                      user={user}
+                      setLoginError={setLoginError}
+                      setLoggedIn={setLoggedIn}
+                    />
+                  )
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  loggedIn ? (
+                    <Navigate to="/" />
+                  ) : (
+                    <LoginForm
+                      setUser={setUser}
+                      user={user}
+                      setLoginError={setLoginError}
+                      setLoggedIn={setLoggedIn}
+                      setUserData={handleUserDataUpdate}
+                    />
+                  )
+                }
+              />
+              <Route
+                path="/prescription/payment/:serviceId"
+                element={
+                  <PrivateRoute>
+                    <Elements stripe={stripePromise}>
+                      <PaymentPage />
+                    </Elements>
+                  </PrivateRoute>
+                }
+              />
+              {/* <Route
               path="/tenia-treatment/payment"
               element={
                 <PrivateRoute>
@@ -124,27 +130,27 @@ export default function App() {
                 </PrivateRoute>
               }
             /> */}
-            <Route
-              path="/home"
-              element={
-                <PrivateRoute>
-                  <AuthenticatedLandingPage user={user} />
-                </PrivateRoute>
-              }
-            />
-            <Route path="/otp-verification" element={<OTPVerification />} />
-            <Route path="/contactUs" element={<ContactUs />} />
-            <Route
-              path="/prescription/*"
-              element={<PrescriptionFormContainer />}
-            />
-            <Route
-              path="/solium/*"
-              element={<SoliumFormContainer />}
-            />
+              <Route
+                path="/home"
+                element={
+                  <PrivateRoute>
+                    <AuthenticatedLandingPage user={user} />
+                  </PrivateRoute>
+                }
+              />
+              <Route path="/otp-verification" element={<OTPVerification />} />
+              <Route path="/contactUs" element={<ContactUs />} />
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              <Route
+                path="/prescription/*"
+                element={<PrescriptionFormContainer />}
+              />
+
+              <Route path="/solium/*" element={<SoliumFormContainer />} />
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </PrescriptionFormProvider>
         </div>
         <Footer className="footer" />{" "}
       </Router>

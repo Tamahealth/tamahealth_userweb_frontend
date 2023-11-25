@@ -1,17 +1,18 @@
 // helper.jsx
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL;
 
-const fetchUserInfo = async () => {
-  const userId = localStorage.getItem("userId");
+const fetchUserInfo = async (userId) => {
   try {
     const response = await fetch(
       `${BASE_URL}/api/prescriptions/user/${userId}`
     );
     if (!response.ok) {
+      if (response.status === 404) {
+        return null; // or handle not found user accordingly
+      }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    // console.log("User data:", data);
     return data;
   } catch (error) {
     console.error("Could not fetch user data:", error);
@@ -37,7 +38,12 @@ async function handleFileUpload(event) {
 
     const result = await response.json();
     console.log("File uploaded, URL:", result.fileUrl);
-    return { fileUrl: result.fileUrl, fileKey: result.fileKey };
+    if (result.fileUrl && result.fileKey) {
+      console.log("File uploaded, URL:", result.fileUrl);
+      return { fileUrl: result.fileUrl, fileKey: result.fileKey };
+    } else {
+      throw new Error("Upload result does not have fileUrl or fileKey");
+    }
   } catch (error) {
     console.error("Upload failed", error);
     throw error;
@@ -70,6 +76,7 @@ const deletePrescriptionFile = async (fileKey) => {
 const splitFormData = (formData) => {
   const usAddressData = {
     address_line_1: formData.AccountHolderAddress,
+    apartment_number: formData.AccountHolderApartmentNumber,
     city: formData.AccountHolderCity,
     state: formData.AccountHolderState,
     zip: formData.AccountHolderZipCode,
@@ -194,7 +201,8 @@ const submitFormData = async (originalFormData) => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
+    // remove the formData from local storage
+    localStorage.removeItem("formData", "uploadedFileInfo");
     return await response.json();
   } catch (error) {
     console.error("Error submitting form data:", error);
