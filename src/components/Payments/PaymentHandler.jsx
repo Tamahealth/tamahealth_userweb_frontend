@@ -1,7 +1,7 @@
 const BASE_URL = import.meta.env.VITE_APP_BASE_URL;
 import { loadStripe } from "@stripe/stripe-js";
-// const stripePromise = loadStripe(import.meta.env.VITE_APP_STRIPE_PUBLIC_KEY);
-import { getPaymentErrorMessage } from "./paymentErrorHandling";
+const stripePromise = loadStripe(import.meta.env.VITE_APP_STRIPE_PUBLIC_KEY);
+import getStripeErrorMessage from "./paymentErrorHandling";
 
 const PaymentHandler = {
   // Function to fetch service type and details
@@ -117,9 +117,11 @@ const PaymentHandler = {
       });
       console.log("Payment Result:", paymentResult);
       if (paymentResult.error) {
-        const errorCode = paymentResult.error.code;
-        const errorMessage = getPaymentErrorMessage(errorCode);
-        throw new Error(errorMessage);
+        if (paymentResult.error.type === "StripeCardError") {
+          const errorMessage = getStripeErrorMessage(paymentResult.error);
+          throw new Error(errorMessage);
+        }
+        throw new Error(paymentResult.error.message);
       }
 
       if (
@@ -132,7 +134,7 @@ const PaymentHandler = {
       return { success: false, error: "Payment failed" };
     } catch (error) {
       console.error("Payment failed", error);
-      return { success: false, error: error.message };
+      return { success: false, error: error };
     }
   },
 };

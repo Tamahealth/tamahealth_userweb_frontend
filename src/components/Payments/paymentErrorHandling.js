@@ -1,24 +1,36 @@
-// paymentErrorHandling.js
+const getStripeErrorMessage = (error) => {
+  if (error.code === "card_declined" && error.decline_code) {
+    // Handling specific decline codes
+    switch (error.decline_code) {
+      case "insufficient_funds":
+        return "Insufficient funds in your account to complete this payment.";
+      case "lost_card":
+        return "The card has been reported as lost. Please use a different card.";
+      case "stolen_card":
+        return "The card has been reported as stolen. Please use a different card.";
+      case "expired_card":
+        return "Your card has expired. Please use a different card.";
+      case "incorrect_cvc":
+        return "The card’s security code is incorrect. Please check and try again.";
+      // Add other specific decline codes as needed
+      default:
+        return "Your card was declined. Please check your card details or try a different card.";
+    }
+  }
 
-const paymentErrorMessages = {
-  card_declined: "Your card was declined. Please use a different card.",
-  insufficient_funds: "Your card has insufficient funds.",
-  lost_card: "This card has been reported lost. Please use a different card.",
-  stolen_card:
-    "This card has been reported stolen. Please use a different card.",
-  expired_card: "Your card has expired. Please use a different card.",
-  incorrect_cvc: "The CVC number is incorrect. Please try again.",
-  processing_error: "There was a processing error. Please try again.",
-  incorrect_number: "The card number is incorrect. Please try again.",
-  card_velocity_exceeded:
-    "The card's velocity limit has been exceeded. Please try again later or use a different card.",
-  generic_decline:
-    "The card was declined for an unknown reason. Please use a different card.",
+  // Handling other error codes
+  switch (error.code) {
+    case "expired_card":
+      return "Your card has expired. Please use a different card.";
+    case "incorrect_cvc":
+      return "The card’s security code is incorrect. Please check and try again.";
+    case "processing_error":
+      return "An error occurred while processing the card. Please try again later.";
+    case "invalid_number":
+      return "The card number is invalid. Please check the card details.";
+    default:
+      return "An error occurred during payment. Please try again.";
+  }
 };
 
-export const getPaymentErrorMessage = (errorType) => {
-  return (
-    paymentErrorMessages[errorType] ||
-    "An unknown error occurred. Please try again."
-  );
-};
+export default getStripeErrorMessage;

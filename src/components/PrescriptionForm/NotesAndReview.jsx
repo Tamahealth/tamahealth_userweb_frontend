@@ -5,7 +5,9 @@ import { PrescriptionFormContext } from "./PrescriptionFormContext";
 const NotesAndReview = () => {
   const [notes, setNotes] = useState("");
   const navigate = useNavigate();
-  const { formData, userInfo } = useContext(PrescriptionFormContext);
+  const { formData, userInfo, updateFormData } = useContext(
+    PrescriptionFormContext
+  );
 
   const handleEdit = () => {
     navigate("/prescription/patient-and-upload-1");
@@ -13,7 +15,7 @@ const NotesAndReview = () => {
 
   const handleNotesChange = (e) => {
     if (e.target.value.length <= 500) {
-      setNotes(e.target.value);
+      updateFormData({ AdditionalNotes: e.target.value });
     }
   };
 
@@ -122,7 +124,9 @@ const NotesAndReview = () => {
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             rows="4"
             placeholder="Enter additional notes here (max 500 characters)"
-            value={notes}
+            maxLength={500}
+            name="AdditionalNotes"
+            value={formData.AdditionalNotes}
             onChange={handleNotesChange}
           />
           <p className="text-gray-600 text-xs italic">
