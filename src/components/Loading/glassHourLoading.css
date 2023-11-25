@@ -1,0 +1,73 @@
+.glass-container {
+  --uib-size: 100px; /* Adjust size as needed */
+  --uib-color: #3498db; /* Blue color */
+  --uib-speed: 1.75s;
+  --uib-bg-opacity: 0.1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: var(--uib-size);
+  width: var(--uib-size);
+  transform: rotate(45deg);
+  animation: rotate calc(var(--uib-speed) * 2) ease-in-out infinite;
+  margin: auto;
+}
+
+.half {
+  --uib-half-size: calc(var(--uib-size) * 0.435);
+  position: absolute;
+  width: var(--uib-half-size);
+  height: var(--uib-half-size);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.half::before,
+.half::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--uib-color);
+  animation: flow var(--uib-speed) linear infinite;
+}
+
+.half:first-child {
+  top: 8.25%;
+  left: 8.25%;
+  border-radius: 50% 50% calc(var(--uib-size) / 15);
+}
+
+.half:first-child::after {
+  animation-delay: -0.5s;
+}
+
+.half:last-child {
+  bottom: 8.25%;
+  right: 8.25%;
+  transform: rotate(180deg);
+  align-self: flex-end;
+  border-radius: 50% 50% calc(var(--uib-size) / 15);
+}
+
+@keyframes flow {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+
+.loading-text {
+  position: absolute;
+  top: calc(100% + 10px); /* Adjust as needed */
+  color: var(--uib-color);
+  font-family: Arial, sans-serif;
+  animation: none; /* No rotation for the text */
+}

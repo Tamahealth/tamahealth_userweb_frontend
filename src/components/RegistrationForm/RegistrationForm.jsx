@@ -82,12 +82,7 @@ export default function MainComponent({ setLoggedIn, setUser }) {
         setLoginError={setLoginError}
       />
 
-      <div className="mt-10 text-center">
-        <button className="bg-blue-500 text-white hover:bg-blue-400 px-4 py-2 rounded mx-auto">
-          <FontAwesomeIcon icon={faGoogle} className="mr-2" />
-          Continue with Google
-        </button>
-      </div>
+      <div className="mt-10 text-center"></div>
       <div className="text-center mt-5 mb-14">
         <span>Already have an account? </span>
         <a href="/login" className="text-blue-500 hover:underline">

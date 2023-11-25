@@ -1,13 +1,29 @@
 // Import useContext from React and our context
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PrescriptionFormContext } from "./PrescriptionFormContext";
 import { validatePage1From } from "./form-utils/validations";
+import SVGCarLoader from "../Loading/SVGCarLoader";
 
 const PatientAndUpload1 = () => {
   const { formData, updateFormData } = useContext(PrescriptionFormContext);
   const navigate = useNavigate();
   const [inputError, setInputError] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate a loading process
+    const timer = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="loader-wrapper">
+        <SVGCarLoader />
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const value = e.target.type === "file" ? e.target.files[0] : e.target.value;

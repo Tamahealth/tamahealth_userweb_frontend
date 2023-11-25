@@ -385,13 +385,11 @@ const PaymentPage = () => {
                 </div>
                 {/* US states */}
                 <div className="w-1/3 px-2">
-                  <label
-                    htmlFor="state"
-                    className="block mb-2 text-sm text-gray-600"
-                  >
+                  <label className="block mb-2 text-sm text-gray-600">
                     State
                   </label>
                   <select
+                    htmlFor="state"
                     id="state"
                     name="state"
                     // defaultValue=""

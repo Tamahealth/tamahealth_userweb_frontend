@@ -2,9 +2,13 @@ import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PrescriptionFormContext } from "./PrescriptionFormContext";
 import { validatePage2From } from "./form-utils/validations";
+import SVGCarLoader from "../Loading/SVGCarLoader";
+// import GlassHourLoading from "../Loading/glassHourLoading";
+import { hatch } from "ldrs";
 
 const PatientAndUpload2 = () => {
   const [errorMessage, setErrorMessage] = useState("");
+  const [uploadError, setUploadError] = useState("");
   const [inputError, setInputError] = useState({});
   const {
     formData,
@@ -17,6 +21,8 @@ const PatientAndUpload2 = () => {
     deletionErrorMessage,
   } = useContext(PrescriptionFormContext);
   const navigate = useNavigate();
+  const [isUploading, setIsUploading] = useState(false);
+  hatch.register();
 
   const handleChange = async (e) => {
     const { name, type, files } = e.target;
@@ -32,6 +38,7 @@ const PatientAndUpload2 = () => {
           // Set error message for file type
           setErrorMessage("Only PDF, JPG, and PNG files are allowed");
         } else {
+          setIsUploading(true);
           setErrorMessage(""); // Clear any previous error messages
           try {
             const uploadResult = await uploadFile(e);
@@ -42,6 +49,9 @@ const PatientAndUpload2 = () => {
           } catch (uploadError) {
             // Set error message for upload failure
             setErrorMessage("File upload failed: " + uploadError.message);
+            setUploadError(uploadError.message);
+          } finally {
+            setIsUploading(false);
           }
         }
         return;
@@ -239,6 +249,7 @@ const PatientAndUpload2 = () => {
                   {inputError.fileUpload}
                 </p>
               )}
+              {uploadError && <div className="text-red-500">{uploadError}</div>}
             </>
           )}
 
@@ -274,6 +285,13 @@ const PatientAndUpload2 = () => {
             >
               Next
             </button>
+            {isUploading && (
+              <div className="loader-wrapper">
+                <SVGCarLoader />
+                {/* Optional: Add a loading message */}
+                <p className="loading-text">Uploading, please wait...</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

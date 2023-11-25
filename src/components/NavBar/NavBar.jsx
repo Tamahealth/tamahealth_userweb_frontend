@@ -31,6 +31,10 @@ export default function NavBar({
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("userId");
+    localStorage.removeItem("userData");
+    localStorage.removeItem("uploadedFileInfo");
+    localStorage.removeItem("formData");
+
     setLoggedIn(false);
     setUser(null);
     setLoginError("");

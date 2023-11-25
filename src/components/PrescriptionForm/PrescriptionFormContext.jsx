@@ -84,12 +84,14 @@ export const PrescriptionFormProvider = ({ children }) => {
 
     try {
       const data = await fetchUserInfo(userId);
-      setUserInfo({
-        AccountHolderFirstName: data.first_name,
-        AccountHolderLastName: data.last_name,
-        AccountHolderEmail: data.email,
-        AccountHolderPhone: data.phone_number,
-      });
+      if (data) {
+        setUserInfo({
+          AccountHolderFirstName: data.first_name,
+          AccountHolderLastName: data.last_name,
+          AccountHolderEmail: data.email,
+          AccountHolderPhone: data.phone_number,
+        });
+      }
     } catch (error) {
       setError(error.message);
       console.error("Failed to fetch user info:", error);
