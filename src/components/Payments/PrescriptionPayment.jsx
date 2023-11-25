@@ -11,7 +11,19 @@ import { UsaStates } from "usa-states";
 import { PaymentInputValidation } from "./PaymentInputValidation";
 import PaymentHandler from "./PaymentHandler";
 import { useParams } from "react-router-dom";
-import { getPaymentErrorMessage } from "./paymentErrorHandling";
+import Loading from "../Loading/Loading";
+import PaymentSuccess from "./PaymentSuccess";
+import {
+  FaCcVisa,
+  FaCcMastercard,
+  FaCcAmex,
+  FaCcDiscover,
+} from "react-icons/fa";
+import { BsCreditCard } from "react-icons/bs";
+import {
+  submitFormData,
+  // testSplitFormData,
+} from "../PrescriptionForm/form-utils/helpers";
 
 const PaymentPage = () => {
   const stripe = useStripe();
@@ -37,6 +49,12 @@ const PaymentPage = () => {
     cardExpiry: "",
     cardCvc: "",
   });
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [cardBrand, setCardBrand] = useState("");
+
+  useEffect(() => {
+    console.log("Current payment error:", paymentError);
+  }, [paymentError]);
 
   useEffect(() => {
     if (serviceId) {
@@ -93,6 +111,9 @@ const PaymentPage = () => {
     // Update the touched state immediately when the user interacts with the card fields
     if (event.elementType === "cardNumber") {
       setCardNumberTouched(true);
+      if (event.brand) {
+        setCardBrand(event.brand);
+      }
     } else if (event.elementType === "cardExpiry") {
       setCardExpiryTouched(true);
     } else if (event.elementType === "cardCvc") {
@@ -129,6 +150,21 @@ const PaymentPage = () => {
     });
   };
 
+  const renderCardIcon = (brand) => {
+    switch (brand) {
+      case "visa":
+        return <FaCcVisa style={{ margin: 4, width: 40, height: 24 }} />;
+      case "mastercard":
+        return <FaCcMastercard style={{ margin: 4, width: 40, height: 24 }} />;
+      case "amex":
+        return <FaCcAmex style={{ margin: 4, width: 100, height: 24 }} />;
+      case "discover":
+        return <FaCcDiscover style={{ margin: 4, width: 40, height: 24 }} />;
+      default:
+        return null;
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -151,9 +187,8 @@ const PaymentPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Form submission started");
-    setIsTouched(true);
     setIsLoading(true);
+    setIsTouched(true);
     setPaymentError("");
     const userId = localStorage.getItem("userId");
 
@@ -197,19 +232,26 @@ const PaymentPage = () => {
 
         if (result.success) {
           console.log("Payment succeeded!");
+          setPaymentSuccess(true);
+          const formData = JSON.parse(localStorage.getItem("formData"));
+          await submitFormData(formData);
         } else {
           console.error("Payment failed:", result.error);
+          if (result.error.message) {
+            setPaymentError(result.error.message);
+          } else {
+            setPaymentError("An unknown error occurred. Please try again.");
+            setIsLoading(false);
+          }
         }
       } catch (error) {
         console.error("Payment submission error:", error);
-        const errorMessage = getPaymentErrorMessage(error.error);
-        console.log("Error Message to be set:", errorMessage);
-        setPaymentError(errorMessage);
+        setPaymentError("An error occurred during payment submission.");
+        setIsLoading(false);
       }
     } else {
       console.log("Conditions not met for payment submission");
     }
-
     setIsLoading(false);
   };
 
@@ -264,11 +306,13 @@ const PaymentPage = () => {
                 <label className="block mb-2 text-sm text-gray-600">
                   Card Number
                 </label>
-                <CardNumberElement
-                  onChange={handleCardChange}
-                  className="p-3 border border-gray-300 rounded-md"
-                />
-
+                <div className="flex items-center border border-gray-300 rounded-md">
+                  <CardNumberElement
+                    onChange={handleCardChange}
+                    className="p-3 flex-grow text-lg"
+                  />
+                  <div className="p-3">{renderCardIcon(cardBrand)}</div>
+                </div>
                 {cardDetailsErrors.cardNumber && (
                   <p className="text-red-500 text-xs italic">
                     {cardDetailsErrors.cardNumber}
@@ -296,13 +340,19 @@ const PaymentPage = () => {
                   <label className="block mb-2 text-sm text-gray-600">
                     CVC
                   </label>
-                  <CardCvcElement
-                    onChange={handleCardChange}
-                    className="p-3 border border-gray-300 rounded-md"
-                  />
-
+                  <div className="flex items-center border border-gray-300 rounded-md">
+                    <CardCvcElement
+                      onChange={handleCardChange}
+                      className="p-3 flex-grow text-lg" // Increased font size
+                    />
+                    <div className="p-1 text-xl mr-4">
+                      <BsCreditCard />
+                    </div>
+                  </div>
                   {cardDetailsErrors.cardCvc && (
-                    <p className="text-red-500 text-xs italic">
+                    <p className="text-red-500 text-xs italic mt-2">
+                      {" "}
+                      {/* Moved error message below input */}
                       {cardDetailsErrors.cardCvc}
                     </p>
                   )}
@@ -384,7 +434,13 @@ const PaymentPage = () => {
                   I agree to the terms and conditions
                 </label>
               </div>
-              {isLoading && <div className="spinner">Loading...</div>}
+              {isLoading && (
+                <div className="fixed inset-0 bg-white bg-opacity-75 flex justify-center items-center z-50">
+                  <Loading />
+                </div>
+              )}
+
+              {paymentSuccess && <PaymentSuccess />}
               <button
                 type="submit"
                 disabled={!isChecked || isLoading}
@@ -395,12 +451,25 @@ const PaymentPage = () => {
                 {isLoading ? "Processing..." : `Pay $${amount / 100}`}
               </button>
             </form>
-            {paymentError && (
-              <>
-                <p className="text-red-500 text-xs italic">{paymentError}</p>
-                {console.log("Rendering error message:", paymentError)}
-              </>
+            {!isLoading && paymentError && (
+              <div className="text-red-500 text-center mt-2 ">
+                {paymentError}
+              </div>
             )}
+          </div>
+          <div className="text-center mt-4">
+            <p className="text-gray-500 text-xs">
+              Payments are securely processed by Stripe.
+            </p>
+            {/* <button
+              className="text-blue-500 hover:text-blue-700 text-xs"
+              onClick={() => {
+                testSplitFormData();
+              }}
+            >
+              {" "}
+              Test split data
+            </button> */}
           </div>
         </div>
       </div>

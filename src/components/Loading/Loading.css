@@ -1,0 +1,49 @@
+/* loading.css */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin: 0 5px;
+  background-color: #3498db;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.circle-1 {
+  animation-delay: -0.3s;
+}
+
+.circle-2 {
+  animation-delay: -0.15s;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+p {
+  margin-top: 10px;
+  color: #3498db;
+  font-family: 'Arial', sans-serif;
+  letter-spacing: 1px;
+}
